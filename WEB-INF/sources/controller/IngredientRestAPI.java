@@ -3,7 +3,6 @@ package controller;
 import java.io.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import model.dao.IngredientDAO;
 import model.dao.IngredientDAOJdbc;
 import model.pogo.Ingredient;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,7 +17,7 @@ public class IngredientRestAPI extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(IngredientRestAPI.class.getName());
 
-    public static IngredientDAO ingredientDAO = new IngredientDAOJdbc();
+    public static IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res)

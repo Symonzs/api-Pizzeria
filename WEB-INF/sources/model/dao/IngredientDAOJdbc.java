@@ -10,7 +10,7 @@ import java.util.List;
 
 import model.pogo.Ingredient;
 
-public class IngredientDAOJdbc implements IngredientDAO {
+public class IngredientDAOJdbc {
 
     private DS ds;
 
@@ -18,7 +18,6 @@ public class IngredientDAOJdbc implements IngredientDAO {
         ds = new DS();
     }
 
-    @Override
     public List<Ingredient> findAll() {
         List<Ingredient> ingredients = new ArrayList<Ingredient>();
         try (Connection con = ds.getConnection()) {
@@ -33,7 +32,6 @@ public class IngredientDAOJdbc implements IngredientDAO {
         return ingredients;
     }
 
-    @Override
     public Ingredient findById(int ino) {
         Ingredient ingredient = null;
         try (Connection con = ds.getConnection()) {
@@ -49,14 +47,13 @@ public class IngredientDAOJdbc implements IngredientDAO {
         return ingredient;
     }
 
-    @Override
     public boolean save(Ingredient ingredient) {
         try (Connection con = ds.getConnection()) {
             PreparedStatement stmt = con
                     .prepareStatement("INSERT INTO ingredients (ino, name, price) VALUES (?, ?, ?)");
             stmt.setInt(1, ingredient.getIno());
-            stmt.setString(2, ingredient.getName());
-            stmt.setFloat(3, ingredient.getPrice());
+            stmt.setString(2, ingredient.getIname());
+            stmt.setFloat(3, ingredient.getIprice());
             return stmt.executeUpdate() == 1;
         } catch (SQLException e) {
             System.err.println(e.getMessage());

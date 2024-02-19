@@ -2,45 +2,44 @@ package model.pogo;
 
 public class Ingredient {
 
-    private int ino;
-    private String name;
-    private float price;
+    private Integer ino;
+    private String iname;
+    private Float iprice;
 
     public Ingredient() {
     }
 
-    public Ingredient(int ino, String name, float price) {
-        this.ino= ino;
-        this.name = name;
-        this.price = price;
+    public Ingredient(Integer ino, String iname, Float iprice) {
+        this.ino = ino;
+        this.iname = iname;
+        this.iprice = iprice;
     }
 
-    public int getIno() {
+    public Integer getIno() {
         return this.ino;
     }
 
-    public String getName() {
-        return this.name;
+    public String getIname() {
+        return this.iname;
     }
 
-    public float getPrice() {
-        return this.price;
+    public Float getIprice() {
+        return this.iprice;
     }
 
-    public void setIno(int ino) {
+    public void setIno(Integer ino) {
         this.ino = ino;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setIname(String iname) {
+        this.iname = iname;
     }
 
-    public void setPrice(float price) {
-        this.price = price;
+    public void setIprice(Float iprice) {
+        this.iprice = iprice;
     }
 
-    @Override
     public String toString() {
-        return "Ingredient [id=" + ino + ", name=" + name + ", price=" + price + "]";
+        return "Ingredient [ino=" + ino + ", iname=" + iname + ", iprice=" + iprice + "]";
     }
 }
