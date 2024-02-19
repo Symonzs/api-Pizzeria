@@ -2,7 +2,7 @@ package model.dao;
 
 import java.util.List;
 
-import model.dto.Ingredient;
+import model.pogo.Ingredient;
 
 public interface IngredientDAO {
 

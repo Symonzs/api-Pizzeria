@@ -5,7 +5,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import model.dao.IngredientDAO;
 import model.dao.IngredientDAOJdbc;
-import model.dto.Ingredient;
+import model.pogo.Ingredient;
 import jakarta.servlet.annotation.WebServlet;
 
 import java.util.Collection;

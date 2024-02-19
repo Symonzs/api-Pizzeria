@@ -8,7 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.dto.Ingredient;
+import model.pogo.Ingredient;
 
 public class IngredientDAOJdbc implements IngredientDAO {
 
