@@ -1,22 +1,22 @@
-package model.dto;
+package model.pogo;
 
 public class Ingredient {
 
-    private int ino;
+    private int id;
     private String name;
     private float price;
 
     public Ingredient() {
     }
 
-    public Ingredient(int ino, String name, float price) {
-        this.ino = ino;
+    public Ingredient(int id, String name, float price) {
+        this.id= id;
         this.name = name;
         this.price = price;
     }
 
-    public int getIno() {
-        return this.ino;
+    public int getId() {
+        return this.id;
     }
 
     public String getName() {
@@ -27,8 +27,8 @@ public class Ingredient {
         return this.price;
     }
 
-    public void setIno(int ino) {
-        this.ino = ino;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setName(String name) {
@@ -41,6 +41,6 @@ public class Ingredient {
 
     @Override
     public String toString() {
-        return "Ingredient [ino=" + ino + ", name=" + name + ", price=" + price + "]";
+        return "Ingredient [id=" + id + ", name=" + name + ", price=" + price + "]";
     }
 }
