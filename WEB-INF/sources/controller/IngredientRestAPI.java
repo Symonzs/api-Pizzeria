@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet("/ingredients/*")
-public class IngredientRestAPI extends HttpServlet {
+public class IngredientRestAPI extends RestAPI {
 
     private static final Logger logger = Logger.getLogger(IngredientRestAPI.class.getName());
 
@@ -72,12 +72,6 @@ public class IngredientRestAPI extends HttpServlet {
 
         PrintWriter out = res.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
-
-        String[] splits = info.split("/");
-        if (splits.length != 1) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
 
         StringBuilder data = new StringBuilder();
         BufferedReader reader = req.getReader();
