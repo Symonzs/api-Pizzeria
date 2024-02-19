@@ -39,7 +39,7 @@ public class IngredientDAOJdbc {
             stmt.setInt(1, ino);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                ingredient = new Ingredient(rs.getInt("ino"), rs.getString("name"), rs.getFloat("price"));
+                ingredient = new Ingredient(rs.getInt("ino"), rs.getString("iname"), rs.getFloat("iprice"));
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -50,7 +50,7 @@ public class IngredientDAOJdbc {
     public boolean save(Ingredient ingredient) {
         try (Connection con = ds.getConnection()) {
             PreparedStatement stmt = con
-                    .prepareStatement("INSERT INTO ingredients (ino, name, price) VALUES (?, ?, ?)");
+                    .prepareStatement("INSERT INTO ingredients (ino, iname, iprice) VALUES (?, ?, ?)");
             stmt.setInt(1, ingredient.getIno());
             stmt.setString(2, ingredient.getIname());
             stmt.setFloat(3, ingredient.getIprice());
@@ -64,11 +64,11 @@ public class IngredientDAOJdbc {
     public String findNameById(int ino) {
         String name = null;
         try (Connection con = ds.getConnection()) {
-            PreparedStatement stmt = con.prepareStatement("SELECT name FROM ingredients WHERE ino = ?");
+            PreparedStatement stmt = con.prepareStatement("SELECT iname FROM ingredients WHERE ino = ?");
             stmt.setInt(1, ino);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                name = rs.getString("name");
+                name = rs.getString("iname");
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());

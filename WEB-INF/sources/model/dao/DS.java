@@ -1,7 +1,7 @@
 package model.dao;
 
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -16,9 +16,9 @@ public class DS {
     public DS() {
         p = new Properties();
         try (FileInputStream input = new FileInputStream(
-                "/home/infoetu/simon.hayart.etu/tomcat/webapps/pizzalandapi/WEB-INF/ressources/config.conf")) {
+                new File(System.getProperty("user.dir"), "/tomcat/lib/postgresql-42.6.0.jar"))) {
             p.load(input);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.warning(e.getMessage());
         }
     }

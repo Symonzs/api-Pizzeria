@@ -32,6 +32,10 @@ public class IngredientRestAPI extends HttpServlet {
 
         if (info == null || info.equals("/")) {
             Collection<Ingredient> l = ingredientDAO.findAll();
+            if (l == null) {
+                res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
             String jsonstring = objectMapper.writeValueAsString(l);
             out.print(jsonstring);
             return;
