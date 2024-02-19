@@ -16,7 +16,7 @@ public class DS {
     public DS() {
         p = new Properties();
         try (FileInputStream input = new FileInputStream(
-                "/home/infoetu/raphael.kiecken.etu/tomcat/webapps/pizzeria/WEB-INF/ressources/config.conf")) {
+                "/home/infoetu/simon.hayart.etu/tomcat/webapps/pizzalandapi/WEB-INF/ressources/config.conf")) {
             p.load(input);
         } catch (IOException e) {
             logger.warning(e.getMessage());

@@ -1,4 +1,4 @@
-package model.dto;
+package model.pogo;
 
 public class Ingredient {
 
@@ -10,7 +10,7 @@ public class Ingredient {
     }
 
     public Ingredient(int ino, String name, float price) {
-        this.ino = ino;
+        this.ino= ino;
         this.name = name;
         this.price = price;
     }
@@ -41,6 +41,6 @@ public class Ingredient {
 
     @Override
     public String toString() {
-        return "Ingredient [ino=" + ino + ", name=" + name + ", price=" + price + "]";
+        return "Ingredient [id=" + ino + ", name=" + name + ", price=" + price + "]";
     }
 }
