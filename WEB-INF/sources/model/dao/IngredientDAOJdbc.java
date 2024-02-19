@@ -60,4 +60,19 @@ public class IngredientDAOJdbc {
         }
         return false;
     }
+
+    public String findNameById(int ino) {
+        String name = null;
+        try (Connection con = ds.getConnection()) {
+            PreparedStatement stmt = con.prepareStatement("SELECT name FROM ingredients WHERE ino = ?");
+            stmt.setInt(1, ino);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                name = rs.getString("name");
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return name;
+    }
 }
