@@ -15,7 +15,6 @@ public class DS {
 
     public DS() {
         p = new Properties();
-        System.out.println(System.getProperty("user.dir"));
         try (FileInputStream input = new FileInputStream(
                 new File(
                         "/home/infoetu/raphael.kiecken.etu/tomcat/webapps/pizzalandapi/WEB-INF/ressources/config.conf"))) {

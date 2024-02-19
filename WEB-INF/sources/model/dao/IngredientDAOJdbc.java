@@ -75,4 +75,15 @@ public class IngredientDAOJdbc {
         }
         return name;
     }
+
+    public boolean delete(Ingredient ingredient) {
+        try (Connection con = ds.getConnection()) {
+            PreparedStatement stmt = con.prepareStatement("DELETE FROM ingredients WHERE ino = ?");
+            stmt.setInt(1, ingredient.getIno());
+            return stmt.executeUpdate() == 1;
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return false;
+    }
 }

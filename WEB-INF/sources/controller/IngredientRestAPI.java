@@ -66,12 +66,18 @@ public class IngredientRestAPI extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        String info = req.getPathInfo();
+        String info = req.getPathInfo() == null ? "" : req.getPathInfo();
         logger.info("POST /ingredients" + info);
         res.setContentType("application/json;charset=UTF-8");
 
         PrintWriter out = res.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
+
+        String[] splits = info.split("/");
+        if (splits.length != 1) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
         StringBuilder data = new StringBuilder();
         BufferedReader reader = req.getReader();
@@ -82,6 +88,37 @@ public class IngredientRestAPI extends HttpServlet {
 
         Ingredient i = objectMapper.readValue(data.toString(), Ingredient.class);
         if (!IngredientRestAPI.ingredientDAO.save(i)) {
+            res.sendError(HttpServletResponse.SC_CONFLICT);
+            return;
+        }
+        out.print(objectMapper.writeValueAsString(i));
+        return;
+    }
+
+    @Override
+    public void doDelete(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+
+        String info = req.getPathInfo() == null ? "" : req.getPathInfo();
+        logger.info("DELETE /ingredients" + info);
+        res.setContentType("application/json;charset=UTF-8");
+
+        PrintWriter out = res.getWriter();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String[] splits = info.split("/");
+        if (splits.length != 2) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        String id = splits[1];
+        Ingredient i = ingredientDAO.findById(Integer.parseInt(id));
+        if (i == null) {
+            res.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        if (!ingredientDAO.delete(i)) {
             res.sendError(HttpServletResponse.SC_CONFLICT);
             return;
         }
