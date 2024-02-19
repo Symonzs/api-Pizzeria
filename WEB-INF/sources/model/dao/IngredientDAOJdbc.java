@@ -24,7 +24,7 @@ public class IngredientDAOJdbc {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM ingredients");
             while (rs.next()) {
-                ingredients.add(new Ingredient(rs.getInt("ino"), rs.getString("name"), rs.getFloat("price")));
+                ingredients.add(new Ingredient(rs.getInt("ino"), rs.getString("iname"), rs.getFloat("iprice")));
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());

@@ -23,26 +23,21 @@ public class IngredientRestAPI extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        String info = req.getPathInfo();
+        String info = req.getPathInfo() == null ? "" : req.getPathInfo();
         logger.info("GET /ingredients" + info);
         res.setContentType("application/json;charset=UTF-8");
 
         PrintWriter out = res.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        if (info == null || info.equals("/")) {
+        if (info.equals("/") || info.equals("")) {
             Collection<Ingredient> l = ingredientDAO.findAll();
-            if (l == null) {
-                res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
-            }
-            String jsonstring = objectMapper.writeValueAsString(l);
-            out.print(jsonstring);
+            out.print(objectMapper.writeValueAsString(l));
             return;
         }
 
         String[] splits = info.split("/");
-        if (splits.length != 2) {
+        if (splits.length > 3) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -51,6 +46,15 @@ public class IngredientRestAPI extends HttpServlet {
         Ingredient i = ingredientDAO.findById(Integer.parseInt(id));
         if (i == null) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        if (splits.length == 3) {
+            if (splits[2].equals("name")) {
+                out.print(objectMapper.writeValueAsString(i.getIname()));
+                return;
+            }
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
