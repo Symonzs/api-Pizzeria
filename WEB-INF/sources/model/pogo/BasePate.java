@@ -1,7 +1,7 @@
 package model.pogo;
 
 public class BasePate {
-    private int id;
+    private int pano;
     private String name;
 
     public BasePate() {
