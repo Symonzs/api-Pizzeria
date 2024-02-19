@@ -1,0 +1,23 @@
+meta {
+  name: P ingredient W (String,String,String)
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/ingredients/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "ino":"8080",
+    "iname":"pablo",
+    "iprice":"9.99"
+  }
+}
+
+docs {
+  Fonctionne si les info sont valide apres parse
+}

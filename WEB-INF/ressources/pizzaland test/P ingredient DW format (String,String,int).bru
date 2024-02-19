@@ -1,0 +1,22 @@
+meta {
+  name: P ingredient DW format (String,String,int)
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/ingredients/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id":8000,
+    "iname":"work"
+  }
+}
+
+docs {
+  Ne fonctionne pas car manque un param
+}

@@ -1,0 +1,23 @@
+meta {
+  name: P ingredient W
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/ingredients/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "ino":1,
+    "iname":"tomate",
+    "iprice":9.99
+  }
+}
+
+docs {
+  fonctionne ne peux pas faire d'erreur le numéro se changeant tout seul 
+}
