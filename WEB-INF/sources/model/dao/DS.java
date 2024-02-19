@@ -16,7 +16,8 @@ public class DS {
     public DS() {
         p = new Properties();
         try (FileInputStream input = new FileInputStream(
-                new File(System.getProperty("user.dir"), "/tomcat/lib/postgresql-42.6.0.jar"))) {
+                new File(System.getProperty("user.dir"),
+                        "/tomcat/webapps/pizzalandapi/WEB-INF/ressources/config.conf"))) {
             p.load(input);
         } catch (Exception e) {
             logger.warning(e.getMessage());

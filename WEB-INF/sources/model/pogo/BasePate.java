@@ -1,27 +1,27 @@
 package model.pogo;
 
 public class BasePate {
-    private int pano;
+    private int bano;
     private String name;
 
     public BasePate() {
     }
 
     public BasePate(int id, String name) {
-        this.id = id;
+        this.bano = id;
         this.name = name;
     }
 
-    public int getId() {
-        return this.id;
+    public int getBano() {
+        return this.bano;
     }
 
     public String getName() {
         return this.name;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setBano(int id) {
+        this.bano = id;
     }
 
     public void setName(String name) {
