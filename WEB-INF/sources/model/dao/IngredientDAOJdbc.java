@@ -22,7 +22,7 @@ public class IngredientDAOJdbc {
         List<Ingredient> ingredients = new ArrayList<Ingredient>();
         try (Connection con = ds.getConnection()) {
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM ingredients");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM ingredients ORDER BY ino");
             while (rs.next()) {
                 ingredients.add(new Ingredient(rs.getInt("ino"), rs.getString("iname"), rs.getFloat("iprice")));
             }
@@ -35,7 +35,7 @@ public class IngredientDAOJdbc {
     public Ingredient findById(int ino) {
         Ingredient ingredient = null;
         try (Connection con = ds.getConnection()) {
-            PreparedStatement stmt = con.prepareStatement("SELECT * FROM ingredients WHERE ino = ? ORDER BY ino");
+            PreparedStatement stmt = con.prepareStatement("SELECT * FROM ingredients WHERE ino = ?");
             stmt.setInt(1, ino);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -64,7 +64,7 @@ public class IngredientDAOJdbc {
     public String findNameById(int ino) {
         String name = null;
         try (Connection con = ds.getConnection()) {
-            PreparedStatement stmt = con.prepareStatement("SELECT iname FROM ingredients WHERE ino = ? ORDER BY ino");
+            PreparedStatement stmt = con.prepareStatement("SELECT iname FROM ingredients WHERE ino = ?");
             stmt.setInt(1, ino);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
