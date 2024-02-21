@@ -1,0 +1,24 @@
+meta {
+  name: P pizza+ingredient DW pate deja presente
+  type: http
+  seq: 11
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/pizza/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {  
+    "ingredients" : [
+      5
+    ]
+    
+  }
+}
+
+docs {
+  fonctionne pas car la pizza 1 a deja une pate et l'ingredient 5 est une pate
+}

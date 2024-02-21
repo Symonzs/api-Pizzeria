@@ -1,0 +1,24 @@
+meta {
+  name: P pizza DW (pas d'ingredients sur la pizza)
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/pizza/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "piname" : "pas mal la pizza",
+    "ingredientList" : [
+      1, 2
+    ]
+  }
+}
+
+docs {
+  Fonctionne pas il faut au moins une base, une pate et un !ingredient
+}

@@ -1,0 +1,24 @@
+meta {
+  name: P pizza+ingredient DW ingredient inexistant
+  type: http
+  seq: 10
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/pizza/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {  
+    "ingredients" : [
+      100
+    ]
+    
+  }
+}
+
+docs {
+  Fonctionne pas l'ingredients n'est pas dans la bdd
+}

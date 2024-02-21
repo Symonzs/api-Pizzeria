@@ -1,0 +1,24 @@
+meta {
+  name: P pizza+ingredient DW base deja presente
+  type: http
+  seq: 12
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/pizza/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {  
+    "ingredients" : [
+      8
+    ]
+    
+  }
+}
+
+docs {
+  fonctionne pas car la pizza 1 a deja une base et l'ingredient 8 est une base
+}

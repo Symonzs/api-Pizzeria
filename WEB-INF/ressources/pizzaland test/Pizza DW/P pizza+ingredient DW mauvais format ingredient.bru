@@ -1,0 +1,24 @@
+meta {
+  name: P pizza+ingredient DW mauvais format ingredient
+  type: http
+  seq: 14
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/pizza/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {  
+    "ingredients" : [
+      1
+    ]
+    
+  }
+}
+
+docs {
+  Fonctionne pas l'ingredient est deja présent dans la pizza 1
+}

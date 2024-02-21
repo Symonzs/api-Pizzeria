@@ -1,0 +1,24 @@
+meta {
+  name: P pizza DW (pas de type de pate)
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/pizza/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "piname" : "pasdepate",
+    "ingredientList" : [
+      1, 2, 3
+    ]
+  }
+}
+
+docs {
+  Fonctionne pas il faut au moins une base, une !pate et un ingredient
+}

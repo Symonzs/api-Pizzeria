@@ -1,0 +1,24 @@
+meta {
+  name: P pizza + ingredients W
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/pizza/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {  
+    "ingredients" : [
+      1,2,3
+    ]
+    
+  }
+}
+
+docs {
+  Fonctionne ajoute tous les ingredients donné a la pizza 1
+}
