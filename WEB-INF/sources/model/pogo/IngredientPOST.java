@@ -23,7 +23,7 @@ public class IngredientPOST {
     }
 
     public void setIname(String iname) {
-        this.iname = iname;
+        this.iname = iname.toLowerCase();
     }
 
     public void setIprice(Float iprice) {
