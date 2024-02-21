@@ -8,7 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.pogo.Ingredient;
+import model.pogo.IngredientGET;
+import model.pogo.IngredientPOST;
 
 public class IngredientDAOJdbc {
 
@@ -18,13 +19,13 @@ public class IngredientDAOJdbc {
         ds = new DS();
     }
 
-    public List<Ingredient> findAll() {
-        List<Ingredient> ingredients = new ArrayList<Ingredient>();
+    public List<IngredientGET> findAll() {
+        List<IngredientGET> ingredients = new ArrayList<IngredientGET>();
         try (Connection con = ds.getConnection()) {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM ingredients ORDER BY ino");
             while (rs.next()) {
-                ingredients.add(new Ingredient(rs.getInt("ino"), rs.getString("iname"), rs.getFloat("iprice")));
+                ingredients.add(new IngredientGET(rs.getInt("ino"), rs.getString("iname"), rs.getFloat("iprice")));
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -32,14 +33,14 @@ public class IngredientDAOJdbc {
         return ingredients;
     }
 
-    public Ingredient findById(int ino) {
-        Ingredient ingredient = null;
+    public IngredientGET findById(int ino) {
+        IngredientGET ingredient = null;
         try (Connection con = ds.getConnection()) {
             PreparedStatement stmt = con.prepareStatement("SELECT * FROM ingredients WHERE ino = ?");
             stmt.setInt(1, ino);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                ingredient = new Ingredient(rs.getInt("ino"), rs.getString("iname"), rs.getFloat("iprice"));
+                ingredient = new IngredientGET(rs.getInt("ino"), rs.getString("iname"), rs.getFloat("iprice"));
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -47,11 +48,11 @@ public class IngredientDAOJdbc {
         return ingredient;
     }
 
-    public boolean save(Ingredient ingredient) {
+    public boolean save(IngredientPOST ingredient) {
         try (Connection con = ds.getConnection()) {
             PreparedStatement stmt = con
                     .prepareStatement("INSERT INTO ingredients (ino, iname, iprice) VALUES (?, ?, ?)");
-            stmt.setInt(1, ingredient.getIno());
+            stmt.setInt(1, IngredientPOST.COUNTER++);
             stmt.setString(2, ingredient.getIname());
             stmt.setFloat(3, ingredient.getIprice());
             return stmt.executeUpdate() == 1;
@@ -61,22 +62,7 @@ public class IngredientDAOJdbc {
         return false;
     }
 
-    public String findNameById(int ino) {
-        String name = null;
-        try (Connection con = ds.getConnection()) {
-            PreparedStatement stmt = con.prepareStatement("SELECT iname FROM ingredients WHERE ino = ?");
-            stmt.setInt(1, ino);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                name = rs.getString("iname");
-            }
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-        }
-        return name;
-    }
-
-    public boolean delete(Ingredient ingredient) {
+    public boolean delete(IngredientGET ingredient) {
         try (Connection con = ds.getConnection()) {
             PreparedStatement stmt = con.prepareStatement("DELETE FROM ingredients WHERE ino = ?");
             stmt.setInt(1, ingredient.getIno());
@@ -84,6 +70,18 @@ public class IngredientDAOJdbc {
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
+        IngredientPOST.EMPTY_ROWS.add(ingredient.getIno());
+        return false;
+    }
+
+    public boolean deleteAll() {
+        try (Connection con = ds.getConnection()) {
+            Statement stmt = con.createStatement();
+            return stmt.executeUpdate("TRUNCATE TABLE ingredients") == 0;
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        IngredientPOST.COUNTER = 1;
         return false;
     }
 }

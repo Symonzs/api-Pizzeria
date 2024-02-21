@@ -4,7 +4,8 @@ import java.io.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import model.dao.IngredientDAOJdbc;
-import model.pogo.Ingredient;
+import model.pogo.IngredientGET;
+import model.pogo.IngredientPOST;
 import jakarta.servlet.annotation.WebServlet;
 
 import java.util.Collection;
@@ -31,7 +32,7 @@ public class IngredientRestAPI extends RestAPI {
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (info.equals("/") || info.equals("")) {
-            Collection<Ingredient> l = ingredientDAO.findAll();
+            Collection<IngredientGET> l = ingredientDAO.findAll();
             out.print(objectMapper.writeValueAsString(l));
             return;
         }
@@ -43,7 +44,7 @@ public class IngredientRestAPI extends RestAPI {
         }
 
         String id = splits[1];
-        Ingredient i = ingredientDAO.findById(Integer.parseInt(id));
+        IngredientGET i = ingredientDAO.findById(Integer.parseInt(id));
         if (i == null) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -80,7 +81,7 @@ public class IngredientRestAPI extends RestAPI {
             data.append(line);
         }
 
-        Ingredient i = objectMapper.readValue(data.toString(), Ingredient.class);
+        IngredientPOST i = objectMapper.readValue(data.toString(), IngredientPOST.class);
         if (!IngredientRestAPI.ingredientDAO.save(i)) {
             res.sendError(HttpServletResponse.SC_CONFLICT);
             return;
@@ -100,6 +101,15 @@ public class IngredientRestAPI extends RestAPI {
         PrintWriter out = res.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
 
+        if (info.equals("/") || info.equals("")) {
+            if (!ingredientDAO.deleteAll()) {
+                res.sendError(HttpServletResponse.SC_CONFLICT);
+                return;
+            }
+            out.print(objectMapper.writeValueAsString("All ingredients deleted"));
+            return;
+        }
+
         String[] splits = info.split("/");
         if (splits.length != 2) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -107,7 +117,7 @@ public class IngredientRestAPI extends RestAPI {
         }
 
         String id = splits[1];
-        Ingredient i = ingredientDAO.findById(Integer.parseInt(id));
+        IngredientGET i = ingredientDAO.findById(Integer.parseInt(id));
         if (i == null) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;

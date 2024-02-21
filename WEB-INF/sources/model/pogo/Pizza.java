@@ -5,7 +5,7 @@ import java.util.List;
 public class Pizza {
     private Integer pino;
     private String piname;
-    private List<Ingredient> ingredients;
+    private List<IngredientGET> ingredients;
     private double price;
     private String pate;
     private String base;
@@ -13,7 +13,7 @@ public class Pizza {
     public Pizza() {
     }
 
-    public Pizza(Integer pino, String piname, List<Ingredient> ingredients, double price, String pate, String base) {
+    public Pizza(Integer pino, String piname, List<IngredientGET> ingredients, double price, String pate, String base) {
         this.pino = pino;
         this.piname = piname;
         this.ingredients = ingredients;
@@ -30,7 +30,7 @@ public class Pizza {
         return this.piname;
     }
 
-    public List<Ingredient> getIngredients() {
+    public List<IngredientGET> getIngredients() {
         return this.ingredients;
     }
 
@@ -54,7 +54,7 @@ public class Pizza {
         this.piname = piname;
     }
 
-    public void setIngredients(List<Ingredient> ingredients) {
+    public void setIngredients(List<IngredientGET> ingredients) {
         this.ingredients = ingredients;
     }
 
@@ -72,6 +72,7 @@ public class Pizza {
 
     @Override
     public String toString() {
-        return "Pizza [id=" + pino + ", name=" + piname + ", ingredients=" + ingredients + ", price=" + price + ", pate=" + pate + ", base=" + base + "]";
+        return "Pizza [id=" + pino + ", name=" + piname + ", ingredients=" + ingredients + ", price=" + price
+                + ", pate=" + pate + ", base=" + base + "]";
     }
 }

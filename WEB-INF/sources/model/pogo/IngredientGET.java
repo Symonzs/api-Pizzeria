@@ -1,15 +1,15 @@
 package model.pogo;
 
-public class Ingredient {
+public class IngredientGET {
 
     private Integer ino;
     private String iname;
     private Float iprice;
 
-    public Ingredient() {
+    public IngredientGET() {
     }
 
-    public Ingredient(Integer ino, String iname, Float iprice) {
+    public IngredientGET(Integer ino, String iname, Float iprice) {
         this.ino = ino;
         this.iname = iname;
         this.iprice = iprice;
@@ -39,7 +39,13 @@ public class Ingredient {
         this.iprice = iprice;
     }
 
+    @Override
     public String toString() {
-        return "Ingredient [ino=" + ino + ", iname=" + iname + ", iprice=" + iprice + "]";
+        return "{" +
+                " ino='" + getIno() + "'," +
+                " iname='" + getIname() + "'," +
+                " iprice='" + getIprice() + "'" +
+                "}";
     }
+
 }
