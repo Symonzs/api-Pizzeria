@@ -29,12 +29,4 @@ public class IngredientPOST {
     public void setIprice(Float iprice) {
         this.iprice = iprice;
     }
-
-    @Override
-    public String toString() {
-        return "{" +
-                " iname='" + getIname() + "'," +
-                " iprice='" + getIprice() + "'" +
-                "}";
-    }
 }

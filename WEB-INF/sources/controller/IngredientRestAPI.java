@@ -27,38 +27,32 @@ public class IngredientRestAPI extends RestAPI {
         String info = req.getPathInfo() == null ? "" : req.getPathInfo();
         logger.info("GET /ingredients" + info);
         res.setContentType("application/json;charset=UTF-8");
-
         PrintWriter out = res.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
-
         if (info.equals("/") || info.equals("")) {
             Collection<IngredientGET> l = ingredientDAO.findAll();
             out.print(objectMapper.writeValueAsString(l));
             return;
         }
-
         String[] splits = info.split("/");
         if (splits.length > 3) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
         String id = splits[1];
         IngredientGET i = ingredientDAO.findById(Integer.parseInt(id));
         if (i == null) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
         if (splits.length == 3) {
             if (splits[2].equals("name")) {
-                out.print(objectMapper.writeValueAsString(i.getIname()));
+                out.print("{\n \"iname\":\"" + i.getIname() + "\"\n}");
                 return;
             }
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-
         out.print(objectMapper.writeValueAsString(i));
         return;
     }
@@ -70,10 +64,8 @@ public class IngredientRestAPI extends RestAPI {
         String info = req.getPathInfo() == null ? "" : req.getPathInfo();
         logger.info("POST /ingredients" + info);
         res.setContentType("application/json;charset=UTF-8");
-
         PrintWriter out = res.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
-
         StringBuilder data = new StringBuilder();
         BufferedReader reader = req.getReader();
         String line;

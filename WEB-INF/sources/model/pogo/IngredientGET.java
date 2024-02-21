@@ -6,9 +6,6 @@ public class IngredientGET {
     private String iname;
     private Float iprice;
 
-    public IngredientGET() {
-    }
-
     public IngredientGET(Integer ino, String iname, Float iprice) {
         this.ino = ino;
         this.iname = iname;
@@ -38,14 +35,4 @@ public class IngredientGET {
     public void setIprice(Float iprice) {
         this.iprice = iprice;
     }
-
-    @Override
-    public String toString() {
-        return "{" +
-                " ino='" + getIno() + "'," +
-                " iname='" + getIname() + "'," +
-                " iprice='" + getIprice() + "'" +
-                "}";
-    }
-
 }

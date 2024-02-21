@@ -7,8 +7,8 @@ DROP TABLE IF EXISTS liste;
 CREATE TABLE pizzas (
     pino INTEGER,
     piname VARCHAR(255) UNIQUE NOT NULL,
-    pate VARCHAR(255) NOT NULL,
-    base VARCHAR(255) NOT NULL,
+    pipate VARCHAR(255) NOT NULL,
+    pibase VARCHAR(255) NOT NULL,
     CONSTRAINT pk_pizzas PRIMARY KEY (pino)
 );
 

@@ -10,14 +10,18 @@ import java.util.logging.Logger;
 
 public class DS {
 
-    private Properties p;
+    public static final DS INSTANCE = new DS();
+
+    private final Properties p;
     private static final Logger logger = Logger.getLogger(DS.class.getName());
 
     public DS() {
         p = new Properties();
-        try (FileInputStream input = new FileInputStream(
-                new File(
-                        "/home/infoetu/raphael.kiecken.etu/tomcat/webapps/pizzalandapi/WEB-INF/ressources/config.conf"))) {
+        loadProperties("/home/infoetu/raphael.kiecken.etu/tomcat/webapps/pizzalandapi/WEB-INF/ressources/config.conf");
+    }
+
+    public void loadProperties(String path) {
+        try (FileInputStream input = new FileInputStream(new File(path))) {
             p.load(input);
         } catch (Exception e) {
             logger.warning(e.getMessage());
@@ -36,6 +40,10 @@ public class DS {
         }
 
         return DriverManager.getConnection(url, nom, mdp);
+    }
+
+    public static DS getInstance() {
+        return INSTANCE;
     }
 
 }

@@ -2,24 +2,25 @@ package model.pogo;
 
 import java.util.List;
 
-public class Pizza {
+public class PizzaGET {
+
     private Integer pino;
     private String piname;
     private List<IngredientGET> ingredients;
     private double price;
-    private String pate;
-    private String base;
+    private String pipate;
+    private String pibase;
 
-    public Pizza() {
-    }
-
-    public Pizza(Integer pino, String piname, List<IngredientGET> ingredients, double price, String pate, String base) {
+    public PizzaGET(Integer pino, String piname, List<IngredientGET> ingredients, String pate,
+            String base) {
         this.pino = pino;
         this.piname = piname;
         this.ingredients = ingredients;
-        this.price = price;
-        this.pate = pate;
-        this.base = base;
+        for (IngredientGET ingredient : ingredients) {
+            this.price += ingredient.getIprice();
+        }
+        this.pipate = pate;
+        this.pibase = base;
     }
 
     public Integer getPino() {
@@ -38,12 +39,12 @@ public class Pizza {
         return this.price;
     }
 
-    public String getPate() {
-        return this.pate;
+    public String getPipate() {
+        return this.pipate;
     }
 
-    public String getBase() {
-        return this.base;
+    public String getPibase() {
+        return this.pibase;
     }
 
     public void setPino(Integer pino) {
@@ -62,17 +63,11 @@ public class Pizza {
         this.price = price;
     }
 
-    public void setPate(String pate) {
-        this.pate = pate;
+    public void setPipate(String pate) {
+        this.pipate = pate;
     }
 
-    public void setBase(String base) {
-        this.base = base;
-    }
-
-    @Override
-    public String toString() {
-        return "Pizza [id=" + pino + ", name=" + piname + ", ingredients=" + ingredients + ", price=" + price
-                + ", pate=" + pate + ", base=" + base + "]";
+    public void setPibase(String base) {
+        this.pibase = base;
     }
 }
