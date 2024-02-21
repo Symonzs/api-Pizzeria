@@ -6,16 +6,16 @@ DROP TABLE IF EXISTS liste;
 
 CREATE TABLE pizzas (
     pino INTEGER,
-    piname VARCHAR(255),
-    pate VARCHAR(255),
-    base VARCHAR(255),
+    piname VARCHAR(255) UNIQUE NOT NULL,
+    pate VARCHAR(255) NOT NULL,
+    base VARCHAR(255) NOT NULL,
     CONSTRAINT pk_pizzas PRIMARY KEY (pino)
 );
 
 CREATE TABLE ingredients (
     ino INTEGER,
-    iname VARCHAR(255),
-    iprice DECIMAL(5,2),
+    iname VARCHAR(255) UNIQUE NOT NULL,
+    iprice DECIMAL(5,2) NOT NULL,
     CONSTRAINT pk_ingredients PRIMARY KEY (ino)
 );
 

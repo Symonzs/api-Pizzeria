@@ -11,9 +11,7 @@ public class IngredientPOST {
     private String iname;
     private Float iprice;
 
-    public IngredientPOST(String iname, Float iprice) {
-        this.iname = iname;
-        this.iprice = iprice;
+    public IngredientPOST() {
     }
 
     public String getIname() {

@@ -22,8 +22,8 @@ public class IngredientDAOJdbc {
     public List<IngredientGET> findAll() {
         List<IngredientGET> ingredients = new ArrayList<IngredientGET>();
         try (Connection con = ds.getConnection()) {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM ingredients ORDER BY ino");
+            System.out.println("SELECT * FROM ingredients ORDER BY ino");
+            ResultSet rs = con.createStatement().executeQuery("SELECT * FROM ingredients ORDER BY ino");
             while (rs.next()) {
                 ingredients.add(new IngredientGET(rs.getInt("ino"), rs.getString("iname"), rs.getFloat("iprice")));
             }
@@ -38,6 +38,7 @@ public class IngredientDAOJdbc {
         try (Connection con = ds.getConnection()) {
             PreparedStatement stmt = con.prepareStatement("SELECT * FROM ingredients WHERE ino = ?");
             stmt.setInt(1, ino);
+            System.out.println(stmt);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 ingredient = new IngredientGET(rs.getInt("ino"), rs.getString("iname"), rs.getFloat("iprice"));
@@ -50,11 +51,25 @@ public class IngredientDAOJdbc {
 
     public boolean save(IngredientPOST ingredient) {
         try (Connection con = ds.getConnection()) {
+            ResultSet rs = con.createStatement().executeQuery("SELECT ino FROM ingredients ORDER BY ino");
+            int previousIno = 0;
+            while (rs.next()) {
+                if (rs.getInt(1) != previousIno + 1) {
+                    IngredientPOST.EMPTY_ROWS.add(previousIno + 1);
+                }
+                previousIno = rs.getInt(1);
+                IngredientPOST.COUNTER = previousIno + 1;
+            }
             PreparedStatement stmt = con
                     .prepareStatement("INSERT INTO ingredients (ino, iname, iprice) VALUES (?, ?, ?)");
-            stmt.setInt(1, IngredientPOST.COUNTER++);
+            if (IngredientPOST.EMPTY_ROWS.isEmpty()) {
+                stmt.setInt(1, IngredientPOST.COUNTER);
+            } else {
+                stmt.setInt(1, IngredientPOST.EMPTY_ROWS.remove(0));
+            }
             stmt.setString(2, ingredient.getIname());
             stmt.setFloat(3, ingredient.getIprice());
+            System.out.println(stmt);
             return stmt.executeUpdate() == 1;
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -66,6 +81,7 @@ public class IngredientDAOJdbc {
         try (Connection con = ds.getConnection()) {
             PreparedStatement stmt = con.prepareStatement("DELETE FROM ingredients WHERE ino = ?");
             stmt.setInt(1, ingredient.getIno());
+            System.out.println(stmt);
             return stmt.executeUpdate() == 1;
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -76,8 +92,8 @@ public class IngredientDAOJdbc {
 
     public boolean deleteAll() {
         try (Connection con = ds.getConnection()) {
-            Statement stmt = con.createStatement();
-            return stmt.executeUpdate("TRUNCATE TABLE ingredients") == 0;
+            System.out.println("TRUNCATE TABLE ingredients CASCADE");
+            return con.createStatement().executeUpdate("TRUNCATE TABLE ingredients CASCADE") == 0;
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }

@@ -80,7 +80,6 @@ public class IngredientRestAPI extends RestAPI {
         while ((line = reader.readLine()) != null) {
             data.append(line);
         }
-
         IngredientPOST i = objectMapper.readValue(data.toString(), IngredientPOST.class);
         if (!IngredientRestAPI.ingredientDAO.save(i)) {
             res.sendError(HttpServletResponse.SC_CONFLICT);
