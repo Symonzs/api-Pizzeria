@@ -16,7 +16,7 @@ public class IngredientRestAPI extends RestAPI {
     public static IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
 
     private static final String BAD_GET_REQUEST = "La requête doit être de la forme /ingredients ou /ingredients/{id} ou /ingredients/{id}/name (id entier)";
-    private static final String BAD_POST_REQUEST = "La requête doit être de la forme /ingredients avec un ingredient en JSON";
+    private static final String BAD_POST_REQUEST = "La requête doit être de la forme /ingredients avec un ingredient en JSON de la forme {\"iname\":\"nom\",\"iprice\":prix}";
     private static final String BAD_DELETE_REQUEST = "La requête doit être de la forme /ingredients/{id}";
     private static final String NOT_FOUND = "L'ingrediant avec l'identifiant %s n'existe pas";
     private static final String CONFLICT = "Un ingredient avec le même nom existe déjà";
