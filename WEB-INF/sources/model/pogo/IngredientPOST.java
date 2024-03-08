@@ -1,12 +1,9 @@
 package model.pogo;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IngredientPOST {
-
-    public static Integer COUNTER = 1;
-    public static final List<Integer> EMPTY_ROWS = new ArrayList<Integer>();
 
     private String iname;
     private Float iprice;

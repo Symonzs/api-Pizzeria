@@ -10,8 +10,6 @@ import java.util.logging.Logger;
 
 public class DS {
 
-    public static final DS INSTANCE = new DS();
-
     private final Properties p;
     private static final Logger logger = Logger.getLogger(DS.class.getName());
 
@@ -23,6 +21,7 @@ public class DS {
     public void loadProperties(String path) {
         try (FileInputStream input = new FileInputStream(new File(path))) {
             p.load(input);
+            System.out.println("Properties loaded");
         } catch (Exception e) {
             logger.warning(e.getMessage());
         }
@@ -40,10 +39,6 @@ public class DS {
         }
 
         return DriverManager.getConnection(url, nom, mdp);
-    }
-
-    public static DS getInstance() {
-        return INSTANCE;
     }
 
 }

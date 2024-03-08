@@ -3,7 +3,6 @@ package controller;
 import java.io.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import model.dao.IngredientDAOJdbc;
 import model.dao.PizzaDAOJdbc;
 import model.pogo.IngredientGET;
 import model.pogo.IngredientPOST;

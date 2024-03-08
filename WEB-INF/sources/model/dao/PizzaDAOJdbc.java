@@ -9,19 +9,18 @@ import java.util.List;
 
 import model.pogo.PizzaGET;
 import model.pogo.IngredientGET;
-import model.pogo.IngredientPOST;
 
 public class PizzaDAOJdbc {
 
-    private DS ds;
+    private DS dataSource;
 
     public PizzaDAOJdbc() {
-        ds = DS.getInstance();
+        dataSource = new DS();
     }
 
     public List<PizzaGET> findAll() {
         List<PizzaGET> pizzas = new ArrayList<PizzaGET>();
-        try (Connection con = ds.getConnection()) {
+        try (Connection con = dataSource.getConnection()) {
             IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
             System.out.println(
                     "SELECT * FROM pizzas ORDER BY pino");
@@ -34,7 +33,6 @@ public class PizzaDAOJdbc {
                 stmt.setInt(1, rsPizzas.getInt("pino"));
                 ResultSet rsIngredients = stmt.executeQuery();
                 while (rsIngredients.next()) {
-
                     ingredients
                             .add(ingredientDAO.findById(rsIngredients.getInt("ino")));
                 }
