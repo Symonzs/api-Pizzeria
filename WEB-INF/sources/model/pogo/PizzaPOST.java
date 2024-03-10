@@ -9,11 +9,11 @@ public class PizzaPOST {
     public static final List<Integer> EMPTY_ROWS = new ArrayList<Integer>();
 
     private String piname;
-    private List<IngredientGET> ingredients;
+    private List<Integer> ingredients;
     private String pipate;
     private String pibase;
 
-    public PizzaPOST(Integer pino, String piname, List<IngredientGET> ingredients, double price, String pate,
+    public PizzaPOST(Integer pino, String piname, List<Integer> ingredients, double price, String pate,
             String base) {
         this.piname = piname;
         this.ingredients = ingredients;
@@ -25,7 +25,7 @@ public class PizzaPOST {
         return this.piname;
     }
 
-    public List<IngredientGET> getIngredients() {
+    public List<Integer> getIngredients() {
         return this.ingredients;
     }
 
@@ -41,7 +41,7 @@ public class PizzaPOST {
         this.piname = piname;
     }
 
-    public void setIngredients(List<IngredientGET> ingredients) {
+    public void setIngredients(List<Integer> ingredients) {
         this.ingredients = ingredients;
     }
 
@@ -51,5 +51,12 @@ public class PizzaPOST {
 
     public void setPibase(String base) {
         this.pibase = base;
+    }
+
+    public void addIngredients(List<Integer> ingredients) {
+        for (Integer ingredient : ingredients) {
+            if (!this.ingredients.contains(ingredient))
+                this.ingredients.add(ingredient);
+        }
     }
 }

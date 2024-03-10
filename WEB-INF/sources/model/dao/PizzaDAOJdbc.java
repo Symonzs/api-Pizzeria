@@ -6,8 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import model.pogo.PizzaGET;
+import model.pogo.PizzaPOST;
 import model.pogo.IngredientGET;
 
 public class PizzaDAOJdbc {
@@ -45,17 +49,44 @@ public class PizzaDAOJdbc {
         return pizzas;
     }
 
-    public IngredientGET findById(int int1) {
+    public PizzaGET findById(int pino) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
 
-    public boolean deleteAll() {
+    public boolean save(PizzaPOST pizza) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    public boolean save(PizzaGET pizza, Set<Integer> ingredients) {
+        try (Connection con = dataSource.getConnection()) {
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?)");
+            for (IngredientGET ingredient : pizza.getIngredients()) {
+                while (ingredients.contains(ingredient.getIno())) {
+                    ingredients.remove(ingredient.getIno());
+                }
+            }
+            for (int ino : ingredients) {
+                stmt.clearParameters();
+                stmt.setInt(1, pizza.getPino());
+                stmt.setInt(2, ino);
+                System.out.println(stmt);
+                stmt.addBatch();
+            }
+            return stmt.executeBatch().length == ingredients.size();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean delete(PizzaGET pizza) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteAll'");
     }
 
-    public boolean delete(IngredientGET i) {
+    public boolean delete(PizzaGET pizza, int ino) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
