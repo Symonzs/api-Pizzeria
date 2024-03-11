@@ -41,17 +41,16 @@ public class IngredientRestAPI extends RestAPI {
             return;
         }
 
-        String id = splits[1];
         IngredientGET i = null;
         try {
-            i = ingredientDAO.findById(Integer.parseInt(id));
+            i = ingredientDAO.findById(Integer.parseInt(splits[1]));
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
 
         if (i == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, id));
+            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, splits[1]));
             return;
         }
 
@@ -121,10 +120,16 @@ public class IngredientRestAPI extends RestAPI {
             return;
         }
 
-        String id = splits[1];
-        IngredientGET i = ingredientDAO.findById(Integer.parseInt(id));
+        IngredientGET i = null;
+        try {
+            i = ingredientDAO.findById(Integer.parseInt(splits[1]));
+        } catch (NumberFormatException e) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
+            return;
+        }
+
         if (i == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, id));
+            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, splits[1]));
             return;
         }
         ingredientDAO.delete(i);
