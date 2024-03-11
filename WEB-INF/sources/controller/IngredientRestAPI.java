@@ -9,7 +9,6 @@ import model.pogo.IngredientPOST;
 import jakarta.servlet.annotation.WebServlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 @WebServlet("/ingredients/*")
 public class IngredientRestAPI extends RestAPI {
@@ -50,7 +49,6 @@ public class IngredientRestAPI extends RestAPI {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
-
         if (i == null) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, splits[1]));
             return;
@@ -91,10 +89,13 @@ public class IngredientRestAPI extends RestAPI {
             data.append(line);
         }
 
-        IngredientPOST i = null;
-        try {
-            i = objectMapper.readValue(data.toString(), IngredientPOST.class);
-        } catch (UnrecognizedPropertyException e) {
+        if (data.isEmpty()) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_POST_REQUEST);
+            return;
+        }
+
+        IngredientPOST i = objectMapper.readValue(data.toString(), IngredientPOST.class);
+        if (i.getIname() == null || i.getIprice() == null) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_POST_REQUEST);
             return;
         }
@@ -135,11 +136,11 @@ public class IngredientRestAPI extends RestAPI {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
-
         if (i == null) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, splits[1]));
             return;
         }
+
         ingredientDAO.delete(i);
         out.print(objectMapper.writeValueAsString(i));
         return;

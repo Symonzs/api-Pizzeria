@@ -57,8 +57,9 @@ public class PizzaDAOJdbc {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 List<IngredientGET> ingredients = new ArrayList<IngredientGET>();
-                PreparedStatement stmt2 = con.prepareStatement("SELECT ino FROM contient WHERE pino = ?");
+                PreparedStatement stmt2 = con.prepareStatement("SELECT ino FROM contient WHERE pino = ? ORDER BY ino");
                 stmt2.setInt(1, rs.getInt("pino"));
+                System.out.println(stmt2);
                 ResultSet rsIngredients = stmt2.executeQuery();
                 while (rsIngredients.next()) {
                     ingredients.add(ingredientDAO.findById(rsIngredients.getInt("ino")));
@@ -87,7 +88,16 @@ public class PizzaDAOJdbc {
             stmt.setString(3, pizza.getPipate());
             stmt.setString(4, pizza.getPibase());
             System.out.println(stmt);
-            return stmt.executeUpdate() == 1;
+            stmt.executeUpdate();
+            PreparedStatement stmt2 = con.prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?)");
+            for (int ino : pizza.getIngredients()) {
+                stmt2.clearParameters();
+                stmt2.setInt(1, previousPino + 1);
+                stmt2.setInt(2, ino);
+                System.out.println(stmt2);
+                stmt2.executeUpdate();
+            }
+            return true;
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
@@ -117,90 +127,73 @@ public class PizzaDAOJdbc {
     }
 
     public boolean delete(PizzaGET pizza) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteAll'");
+        try (Connection con = dataSource.getConnection()) {
+            PreparedStatement stmt2 = con.prepareStatement("DELETE FROM pizzas WHERE pino = ?");
+            stmt2.setInt(1, pizza.getPino());
+            System.out.println(stmt2);
+            stmt2.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return false;
     }
 
     public boolean delete(PizzaGET pizza, int ino) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        try (Connection con = dataSource.getConnection()) {
+            PreparedStatement stmt = con.prepareStatement("DELETE FROM contient WHERE pino = ? AND ino = ?");
+            stmt.setInt(1, pizza.getPino());
+            stmt.setInt(2, ino);
+            System.out.println(stmt);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return false;
     }
 
-    /*
-     * public PizzaGET findById(int ino) {
-     * PizzaGET ingredient = null;
-     * try (Connection con = ds.getConnection()) {
-     * PreparedStatement stmt =
-     * con.prepareStatement("SELECT * FROM ingredients WHERE ino = ?");
-     * stmt.setInt(1, ino);
-     * System.out.println(stmt);
-     * ResultSet rs = stmt.executeQuery();
-     * if (rs.next()) {
-     * ingredient = new PizzaGET(rs.getInt("ino"), rs.getString("iname"),
-     * rs.getFloat("iprice"));
-     * }
-     * } catch (SQLException e) {
-     * System.err.println(e.getMessage());
-     * }
-     * return ingredient;
-     * }
-     * 
-     * public boolean save(IngredientPOST ingredient) {
-     * try (Connection con = ds.getConnection()) {
-     * ResultSet rs =
-     * con.createStatement().executeQuery("SELECT ino FROM ingredients ORDER BY ino"
-     * );
-     * int previousIno = 0;
-     * while (rs.next()) {
-     * if (rs.getInt(1) != previousIno + 1) {
-     * IngredientPOST.EMPTY_ROWS.add(previousIno + 1);
-     * }
-     * previousIno = rs.getInt(1);
-     * IngredientPOST.COUNTER = previousIno + 1;
-     * }
-     * PreparedStatement stmt = con
-     * .prepareStatement("INSERT INTO ingredients (ino, iname, iprice) VALUES (?, ?, ?)"
-     * );
-     * if (IngredientPOST.EMPTY_ROWS.isEmpty()) {
-     * stmt.setInt(1, IngredientPOST.COUNTER);
-     * } else {
-     * stmt.setInt(1, IngredientPOST.EMPTY_ROWS.remove(0));
-     * }
-     * stmt.setString(2, ingredient.getIname());
-     * stmt.setFloat(3, ingredient.getIprice());
-     * System.out.println(stmt);
-     * return stmt.executeUpdate() == 1;
-     * } catch (SQLException e) {
-     * System.err.println(e.getMessage());
-     * }
-     * return false;
-     * }
-     * 
-     * public boolean delete(IngredientGET ingredient) {
-     * try (Connection con = ds.getConnection()) {
-     * PreparedStatement stmt =
-     * con.prepareStatement("DELETE FROM ingredients WHERE ino = ?");
-     * stmt.setInt(1, ingredient.getIno());
-     * System.out.println(stmt);
-     * return stmt.executeUpdate() == 1;
-     * } catch (SQLException e) {
-     * System.err.println(e.getMessage());
-     * }
-     * IngredientPOST.EMPTY_ROWS.add(ingredient.getIno());
-     * return false;
-     * }
-     * 
-     * public boolean deleteAll() {
-     * try (Connection con = ds.getConnection()) {
-     * System.out.println("TRUNCATE TABLE ingredients CASCADE");
-     * return
-     * con.createStatement().executeUpdate("TRUNCATE TABLE ingredients CASCADE") ==
-     * 0;
-     * } catch (SQLException e) {
-     * System.err.println(e.getMessage());
-     * }
-     * IngredientPOST.COUNTER = 1;
-     * return false;
-     * }
-     */
+    public boolean update(int pino, PizzaPOST pizza) {
+        try (Connection con = dataSource.getConnection()) {
+            if (pizza.getPiname() != null) {
+                PreparedStatement stmt = con.prepareStatement("UPDATE pizzas SET piname = ? WHERE pino = ?");
+                stmt.setString(1, pizza.getPiname());
+                stmt.setInt(2, pino);
+                System.out.println(stmt);
+                stmt.executeUpdate();
+            }
+            if (pizza.getPipate() != null) {
+                PreparedStatement stmt = con.prepareStatement("UPDATE pizzas SET pipate = ? WHERE pino = ?");
+                stmt.setString(1, pizza.getPipate());
+                stmt.setInt(2, pino);
+                System.out.println(stmt);
+                stmt.executeUpdate();
+            }
+            if (pizza.getPibase() != null) {
+                PreparedStatement stmt = con.prepareStatement("UPDATE pizzas SET pibase = ? WHERE pino = ?");
+                stmt.setString(1, pizza.getPibase());
+                stmt.setInt(2, pino);
+                System.out.println(stmt);
+                stmt.executeUpdate();
+            }
+            if (pizza.getIngredients() != null) {
+                PreparedStatement stmt = con.prepareStatement("DELETE FROM contient WHERE pino = ?");
+                stmt.setInt(1, pino);
+                System.out.println(stmt);
+                stmt.executeUpdate();
+                stmt = con.prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?)");
+                for (int ino : pizza.getIngredients()) {
+                    stmt.clearParameters();
+                    stmt.setInt(1, pino);
+                    stmt.setInt(2, ino);
+                    System.out.println(stmt);
+                    stmt.executeUpdate();
+                }
+            }
+            return true;
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return false;
+    }
 }

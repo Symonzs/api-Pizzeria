@@ -2,6 +2,9 @@ package model.pogo;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PizzaGET {
 
     private Integer pino;
@@ -18,11 +21,13 @@ public class PizzaGET {
         this.ingredients = ingredients;
         this.price = 0.0f;
         for (IngredientGET ingredient : ingredients) {
-            System.out.println(ingredient.getIprice());
             this.price += ingredient.getIprice();
         }
         this.pipate = pate;
         this.pibase = base;
+    }
+
+    public PizzaGET() {
     }
 
     public Integer getPino() {
