@@ -7,7 +7,7 @@ public class PizzaGET {
     private Integer pino;
     private String piname;
     private List<IngredientGET> ingredients;
-    private double price;
+    private float price;
     private String pipate;
     private String pibase;
 
@@ -16,7 +16,9 @@ public class PizzaGET {
         this.pino = pino;
         this.piname = piname;
         this.ingredients = ingredients;
+        this.price = 0.0f;
         for (IngredientGET ingredient : ingredients) {
+            System.out.println(ingredient.getIprice());
             this.price += ingredient.getIprice();
         }
         this.pipate = pate;
@@ -59,7 +61,7 @@ public class PizzaGET {
         this.ingredients = ingredients;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 

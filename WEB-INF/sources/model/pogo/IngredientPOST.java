@@ -1,8 +1,5 @@
 package model.pogo;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class IngredientPOST {
 
     private String iname;

@@ -1,5 +1,5 @@
 meta {
-  name: P pizza DW (pas de type de pate)
+  name: erreur format json (pas de pate)
   type: http
   seq: 3
 }
@@ -13,9 +13,10 @@ post {
 body:json {
   {
     "piname" : "pasdepate",
-    "ingredientList" : [
+    "ingredients" : [
       1, 2, 3
-    ]
+    ],
+    "pibase":"tomate"
   }
 }
 

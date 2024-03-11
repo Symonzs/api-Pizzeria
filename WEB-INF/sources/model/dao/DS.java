@@ -21,7 +21,6 @@ public class DS {
     public void loadProperties(String path) {
         try (FileInputStream input = new FileInputStream(new File(path))) {
             p.load(input);
-            System.out.println("Properties loaded");
         } catch (Exception e) {
             logger.warning(e.getMessage());
         }

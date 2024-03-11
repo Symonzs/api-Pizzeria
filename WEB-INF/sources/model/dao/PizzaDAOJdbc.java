@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import model.pogo.PizzaGET;
 import model.pogo.PizzaPOST;
 import model.pogo.IngredientGET;
@@ -50,13 +48,50 @@ public class PizzaDAOJdbc {
     }
 
     public PizzaGET findById(int pino) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        PizzaGET pizza = null;
+        try (Connection con = dataSource.getConnection()) {
+            IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
+            PreparedStatement stmt = con.prepareStatement("SELECT * FROM pizzas WHERE pino = ?");
+            stmt.setInt(1, pino);
+            System.out.println(stmt);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                List<IngredientGET> ingredients = new ArrayList<IngredientGET>();
+                PreparedStatement stmt2 = con.prepareStatement("SELECT ino FROM contient WHERE pino = ?");
+                stmt2.setInt(1, rs.getInt("pino"));
+                ResultSet rsIngredients = stmt2.executeQuery();
+                while (rsIngredients.next()) {
+                    ingredients.add(ingredientDAO.findById(rsIngredients.getInt("ino")));
+                }
+                pizza = new PizzaGET(rs.getInt("pino"), rs.getString("piname"), ingredients, rs.getString("pipate"),
+                        rs.getString("pibase"));
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return pizza;
     }
 
     public boolean save(PizzaPOST pizza) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        try (Connection con = dataSource.getConnection()) {
+            ResultSet rs = con.createStatement().executeQuery("SELECT pino FROM pizzas ORDER BY pino");
+            int previousPino = 0;
+            while (rs.next()) {
+                if (rs.getInt("pino") == previousPino + 1)
+                    previousPino = rs.getInt("pino");
+            }
+            PreparedStatement stmt = con.prepareStatement(
+                    "INSERT INTO pizzas (pino, piname, pipate, pibase) VALUES (?, ?, ?, ?)");
+            stmt.setInt(1, previousPino + 1);
+            stmt.setString(2, pizza.getPiname());
+            stmt.setString(3, pizza.getPipate());
+            stmt.setString(4, pizza.getPibase());
+            System.out.println(stmt);
+            return stmt.executeUpdate() == 1;
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return false;
     }
 
     public boolean save(PizzaGET pizza, Set<Integer> ingredients) {

@@ -5,20 +5,12 @@ import java.util.List;
 
 public class PizzaPOST {
 
-    public static Integer COUNTER = 1;
-    public static final List<Integer> EMPTY_ROWS = new ArrayList<Integer>();
-
     private String piname;
     private List<Integer> ingredients;
     private String pipate;
     private String pibase;
 
-    public PizzaPOST(Integer pino, String piname, List<Integer> ingredients, double price, String pate,
-            String base) {
-        this.piname = piname;
-        this.ingredients = ingredients;
-        this.pipate = pate;
-        this.pibase = base;
+    public PizzaPOST() {
     }
 
     public String getPiname() {
@@ -58,5 +50,18 @@ public class PizzaPOST {
             if (!this.ingredients.contains(ingredient))
                 this.ingredients.add(ingredient);
         }
+    }
+
+    public static PizzaPOST fromPizzaGET(PizzaGET pg) {
+        PizzaPOST pp = new PizzaPOST();
+        pp.setPiname(pg.getPiname());
+        List<Integer> ingredients = new ArrayList<Integer>();
+        for (IngredientGET ingredient : pg.getIngredients()) {
+            ingredients.add(ingredient.getIno());
+        }
+        pp.setIngredients(ingredients);
+        pp.setPipate(pg.getPipate());
+        pp.setPibase(pg.getPibase());
+        return pp;
     }
 }
