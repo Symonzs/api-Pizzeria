@@ -8,12 +8,17 @@ public class CommandeGET {
     private String cname;
     private String cdate;
     private List<PizzaGET> pizzas;
-    
+    private float price;
+
     public CommandeGET(Integer cno, String cname, String cdate, List<PizzaGET> pizzas) {
         this.cno = cno;
         this.cname = cname;
         this.cdate = cdate;
         this.pizzas = pizzas;
+        this.price = 0;
+        for (PizzaGET pizza : pizzas) {
+            this.price += pizza.getPrice();
+        }
     }
 
     public Integer getCno() {
@@ -30,6 +35,10 @@ public class CommandeGET {
 
     public List<PizzaGET> getPizzas() {
         return this.pizzas;
+    }
+
+    public float getPrice() {
+        return this.price;
     }
 
     public void setCno(Integer cno) {

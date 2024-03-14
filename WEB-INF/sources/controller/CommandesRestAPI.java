@@ -3,7 +3,9 @@ package controller;
 import java.io.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import model.dao.CommandesDAOJdbc;
 import model.dao.IngredientDAOJdbc;
+import model.pogo.CommandeGET;
 import model.pogo.IngredientGET;
 import model.pogo.IngredientPOST;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,7 +16,7 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 @WebServlet("/commandes/*")
 public class CommandesRestAPI extends RestAPI {
 
-    public static IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
+    public static CommandesDAOJdbc commandesDAO = new CommandesDAOJdbc();
 
     private static final String BAD_GET_REQUEST = "La requête doit être de la forme /commandes ou /commandes/{id} ou /commandes/{id}/prixfinal (id entier)";
     private static final String BAD_POST_REQUEST = "La requête doit être de la forme /commandes avec une commande en JSON de la forme {\"cname\":\"nom\",\"cdate\":\"date\",\"pizzas\":[1,2,3]}";
@@ -33,7 +35,7 @@ public class CommandesRestAPI extends RestAPI {
         ObjectMapper objectMapper = new ObjectMapper();
 
         if (info.equals("/") || info.equals("")) {
-            out.print(objectMapper.writeValueAsString(ingredientDAO.findAll()));
+            out.print(objectMapper.writeValueAsString(commandesDAO.findAll()));
             return;
         }
 
@@ -43,28 +45,28 @@ public class CommandesRestAPI extends RestAPI {
             return;
         }
 
-        IngredientGET i = null;
+        CommandeGET c = null;
         try {
-            i = ingredientDAO.findById(Integer.parseInt(splits[1]));
+            c = commandesDAO.findById(Integer.parseInt(splits[1]));
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
-        if (i == null) {
+        if (c == null) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, splits[1]));
             return;
         }
 
         if (splits.length == 3) {
-            if (splits[2].equals("name")) {
-                out.print("{\n \"iname\":\"" + i.getIname() + "\"\n}");
+            if (splits[2].equals("prixfinal")) {
+                out.print("{\n \"prixfinal\":\"" + c.getPrice() + "\"\n}");
                 return;
             }
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
 
-        out.print(objectMapper.writeValueAsString(i));
+        out.print(objectMapper.writeValueAsString(c));
         return;
     }
 
@@ -135,9 +137,9 @@ public class CommandesRestAPI extends RestAPI {
             return;
         }
 
-        IngredientGET i = null;
+        CommandeGET i = null;
         try {
-            i = ingredientDAO.findById(Integer.parseInt(splits[1]));
+            i = commandesDAO.findById(Integer.parseInt(splits[1]));
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
@@ -147,7 +149,7 @@ public class CommandesRestAPI extends RestAPI {
             return;
         }
 
-        ingredientDAO.delete(i);
+        commandesDAO.delete(i);
         out.print(objectMapper.writeValueAsString(i));
         return;
     }
