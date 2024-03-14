@@ -1,0 +1,22 @@
+meta {
+  name: put pizza erreur format json
+  type: http
+  seq: 19
+}
+
+put {
+  url: http://localhost:8080/pizzalandapi/pizzas/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name":"laundetrois",
+    "ingredients":[
+      1,2
+    ],
+    "pibase":"crème",
+    "pipate":"giga fat"
+  }
+}

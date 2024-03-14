@@ -1,0 +1,22 @@
+meta {
+  name: put pizza ingredient inexistant
+  type: http
+  seq: 20
+}
+
+put {
+  url: http://localhost:8080/pizzalandapi/pizzas/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "piname":"laundetrois",
+    "ingredients":[
+      1, 2, 100
+    ],
+    "pibase":"crème",
+    "pipate":"giga fat"
+  }
+}

@@ -53,6 +53,8 @@ public class PizzaPOST {
     }
 
     public static PizzaPOST fromPizzaGET(PizzaGET pg) {
+        if (pg == null)
+            return null;
         PizzaPOST pp = new PizzaPOST();
         pp.setPiname(pg.getPiname());
         List<Integer> ingredients = new ArrayList<Integer>();
@@ -62,6 +64,32 @@ public class PizzaPOST {
         pp.setIngredients(ingredients);
         pp.setPipate(pg.getPipate());
         pp.setPibase(pg.getPibase());
+        return pp;
+    }
+
+    public static PizzaPOST updatePizzaPOST(PizzaGET pg, PizzaPOST pp) {
+        if (pg == null || pp == null)
+            return null;
+        if (pg.getPiname().equals(pp.getPiname())) {
+            pp.setPiname(null);
+        } else {
+            pp.setPiname(pg.getPiname());
+        }
+        if (pg.getPipate().equals(pp.getPipate())) {
+            pp.setPipate(null);
+        } else {
+            pp.setPipate(pg.getPipate());
+        }
+        if (pg.getPibase().equals(pp.getPibase())) {
+            pp.setPibase(null);
+        } else {
+            pp.setPibase(pg.getPibase());
+        }
+        for (IngredientGET i : pg.getIngredients()) {
+            if (!pp.getIngredients().contains(i.getIno())) {
+                pp.getIngredients().add(i.getIno());
+            }
+        }
         return pp;
     }
 }

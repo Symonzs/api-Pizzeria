@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.pogo.CommandeGET;
-import model.pogo.IngredientGET;
 import model.pogo.PizzaGET;
 
 public class CommandeDAOJdbc {
@@ -18,7 +17,7 @@ public class CommandeDAOJdbc {
         this.dataSource = new DS();
     }
 
-        public List<CommandeGET> findAll() {
+    public List<CommandeGET> findAll() {
         List<CommandeGET> commandes = new ArrayList<>();
         try (Connection con = dataSource.getConnection()) {
             PizzaDAOJdbc pizzaDAO = new PizzaDAOJdbc();
@@ -37,8 +36,9 @@ public class CommandeDAOJdbc {
                             .add(pizzaDAO.findById(rsCom.getInt("pino")));
 
                 }
-                commandes.add(new CommandeGET(rsCom.getInt("cno"), rsCom.getString("cname"), rsCom.getString("cdate"), pizzas));
-                
+                commandes.add(new CommandeGET(rsCom.getInt("cno"), rsCom.getString("cname"), rsCom.getString("cdate"),
+                        pizzas));
+
             }
             return commandes;
         } catch (SQLException e) {
@@ -47,5 +47,4 @@ public class CommandeDAOJdbc {
         return null;
     }
 
-    
 }

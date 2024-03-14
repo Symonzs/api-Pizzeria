@@ -1,0 +1,18 @@
+meta {
+  name: patch erreur format requete
+  type: http
+  seq: 13
+}
+
+patch {
+  url: http://localhost:8080/pizzalandapi/pizzas/erreur
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "pibase":"crème",
+    "pipate":"giga fat"
+  }
+}

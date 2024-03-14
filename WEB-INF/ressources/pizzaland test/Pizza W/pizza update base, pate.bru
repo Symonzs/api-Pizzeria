@@ -1,0 +1,21 @@
+meta {
+  name: pizza update base, pate
+  type: http
+  seq: 9
+}
+
+patch {
+  url: http://localhost:8080/pizzalandapi/pizzas/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "pibase":"crème",
+    "pipate":"giga fat",
+    "ingredients":[
+      1, 3
+    ]
+  }
+}

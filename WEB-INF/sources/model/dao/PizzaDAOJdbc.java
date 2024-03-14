@@ -177,18 +177,62 @@ public class PizzaDAOJdbc {
                 stmt.executeUpdate();
             }
             if (pizza.getIngredients() != null) {
-                PreparedStatement stmt = con.prepareStatement("DELETE FROM contient WHERE pino = ?");
-                stmt.setInt(1, pino);
-                System.out.println(stmt);
-                stmt.executeUpdate();
-                stmt = con.prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?)");
+                con.setAutoCommit(false);
+                PreparedStatement stmt = con
+                        .prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?) ON CONFLICT DO NOTHING");
                 for (int ino : pizza.getIngredients()) {
                     stmt.clearParameters();
                     stmt.setInt(1, pino);
                     stmt.setInt(2, ino);
                     System.out.println(stmt);
-                    stmt.executeUpdate();
+                    stmt.addBatch();
                 }
+                stmt.executeBatch();
+            }
+            return true;
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean put(int pino, PizzaPOST pizza) {
+        try (Connection con = dataSource.getConnection()) {
+            if (pizza.getPiname() != null) {
+                PreparedStatement stmt = con.prepareStatement("UPDATE pizzas SET piname = ? WHERE pino = ?");
+                stmt.setString(1, pizza.getPiname());
+                stmt.setInt(2, pino);
+                System.out.println(stmt);
+                stmt.executeUpdate();
+            }
+            if (pizza.getPipate() != null) {
+                PreparedStatement stmt = con.prepareStatement("UPDATE pizzas SET pipate = ? WHERE pino = ?");
+                stmt.setString(1, pizza.getPipate());
+                stmt.setInt(2, pino);
+                System.out.println(stmt);
+                stmt.executeUpdate();
+            }
+            if (pizza.getPibase() != null) {
+                PreparedStatement stmt = con.prepareStatement("UPDATE pizzas SET pibase = ? WHERE pino = ?");
+                stmt.setString(1, pizza.getPibase());
+                stmt.setInt(2, pino);
+                System.out.println(stmt);
+                stmt.executeUpdate();
+            }
+            if (pizza.getIngredients() != null) {
+                PreparedStatement stmt = con.prepareStatement("DELETE FROM contient WHERE pino = ?");
+                stmt.setInt(1, pino);
+                System.out.println(stmt);
+                stmt.executeUpdate();
+                PreparedStatement stmt2 = con.prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?)");
+                for (int ino : pizza.getIngredients()) {
+                    stmt2.clearParameters();
+                    stmt2.setInt(1, pino);
+                    stmt2.setInt(2, ino);
+                    System.out.println(stmt2);
+                    stmt2.addBatch();
+                }
+                stmt2.executeBatch();
             }
             return true;
         } catch (SQLException e) {

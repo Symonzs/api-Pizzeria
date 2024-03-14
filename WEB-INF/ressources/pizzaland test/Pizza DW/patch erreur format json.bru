@@ -1,0 +1,17 @@
+meta {
+  name: patch erreur format json
+  type: http
+  seq: 14
+}
+
+patch {
+  url: http://localhost:8080/pizzalandapi/pizzas/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "base":"crème"
+  }
+}
