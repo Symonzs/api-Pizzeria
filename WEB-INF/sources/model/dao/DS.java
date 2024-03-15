@@ -15,7 +15,7 @@ public class DS {
 
     public DS() {
         p = new Properties();
-        loadProperties("/home/infoetu/raphael.kiecken.etu/tomcat/webapps/pizzalandapi/WEB-INF/ressources/config.conf");
+        loadProperties("../webapps/pizzalandapi/WEB-INF/ressources/config.conf");
     }
 
     public void loadProperties(String path) {

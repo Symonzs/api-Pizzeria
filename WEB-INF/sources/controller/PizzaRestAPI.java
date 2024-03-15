@@ -284,6 +284,8 @@ public class PizzaRestAPI extends RestAPI {
             return;
         }
 
+        System.out.println(p.getPiname() + " " + p.getPipate() + " " + p.getPibase() + " " + p.getIngredients());
+
         if (!pizzaDAO.update(Integer.parseInt(splits[1]), p)) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND,
                     String.format(NOT_FOUND_INGREDIENTS, p.getIngredients()));

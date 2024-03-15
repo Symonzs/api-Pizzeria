@@ -4,9 +4,7 @@ import java.io.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import model.dao.CommandesDAOJdbc;
-import model.dao.IngredientDAOJdbc;
 import model.pogo.CommandeGET;
-import model.pogo.IngredientGET;
 import model.pogo.IngredientPOST;
 import jakarta.servlet.annotation.WebServlet;
 

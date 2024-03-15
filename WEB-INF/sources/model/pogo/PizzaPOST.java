@@ -68,28 +68,29 @@ public class PizzaPOST {
     }
 
     public static PizzaPOST updatePizzaPOST(PizzaGET pg, PizzaPOST pp) {
+        PizzaPOST p = new PizzaPOST();
         if (pg == null || pp == null)
             return null;
         if (pg.getPiname().equals(pp.getPiname())) {
-            pp.setPiname(null);
+            p.setPiname(null);
         } else {
-            pp.setPiname(pg.getPiname());
+            p.setPiname(pp.getPiname());
         }
         if (pg.getPipate().equals(pp.getPipate())) {
-            pp.setPipate(null);
+            p.setPipate(null);
         } else {
-            pp.setPipate(pg.getPipate());
+            p.setPipate(pp.getPipate());
         }
         if (pg.getPibase().equals(pp.getPibase())) {
-            pp.setPibase(null);
+            p.setPibase(null);
         } else {
-            pp.setPibase(pg.getPibase());
+            p.setPibase(pp.getPibase());
         }
-        for (IngredientGET i : pg.getIngredients()) {
-            if (!pp.getIngredients().contains(i.getIno())) {
-                pp.getIngredients().add(i.getIno());
-            }
+        if (pg.getIngredients().equals(pp.getIngredients())) {
+            p.setIngredients(null);
+        } else {
+            p.setIngredients(pp.getIngredients());
         }
-        return pp;
+        return p;
     }
 }

@@ -177,17 +177,24 @@ public class PizzaDAOJdbc {
                 stmt.executeUpdate();
             }
             if (pizza.getIngredients() != null) {
-                con.setAutoCommit(false);
                 PreparedStatement stmt = con
-                        .prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?) ON CONFLICT DO NOTHING");
+                        .prepareStatement("SELECT Count(*) FROM contient WHERE pino = ? AND ino = ?");
+                PreparedStatement stmt2 = con.prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?)");
                 for (int ino : pizza.getIngredients()) {
                     stmt.clearParameters();
                     stmt.setInt(1, pino);
                     stmt.setInt(2, ino);
                     System.out.println(stmt);
-                    stmt.addBatch();
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) == 0) {
+                        stmt2.clearParameters();
+                        stmt2.setInt(1, pino);
+                        stmt2.setInt(2, ino);
+                        System.out.println(stmt2);
+                        stmt2.addBatch();
+                    }
                 }
-                stmt.executeBatch();
+                stmt2.executeBatch();
             }
             return true;
         } catch (SQLException e) {
@@ -220,6 +227,7 @@ public class PizzaDAOJdbc {
                 stmt.executeUpdate();
             }
             if (pizza.getIngredients() != null) {
+                con.setAutoCommit(false);
                 PreparedStatement stmt = con.prepareStatement("DELETE FROM contient WHERE pino = ?");
                 stmt.setInt(1, pino);
                 System.out.println(stmt);
@@ -233,6 +241,8 @@ public class PizzaDAOJdbc {
                     stmt2.addBatch();
                 }
                 stmt2.executeBatch();
+                con.commit();
+                con.setAutoCommit(true);
             }
             return true;
         } catch (SQLException e) {
