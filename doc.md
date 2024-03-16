@@ -441,6 +441,271 @@ Codes de status HTTP
 | 404 NOT FOUND | La pizza n'existe pas  |
 
 
+## Commandes
+
+| URI | Opération | MIME | Requête |Réponse|
+|:---------:|:---------:|:---------:|:---------:|:---------:|
+|   /commandes   |   GET   | <- application/json |  | liste des commandes (l1) |
+|   /commandes/{id}   |   GET   | <- application/json |  | une commande ou 404 |
+|   /commandes   |   POST   | <-/-> application/json | Commande (l2) | nouvelle commande ou 409 si elle existe déjà |
+|   /commandes{id}   |   DELETE   | text/plain |  | rien ou 409|
+|   /commandes/{id}/prixtotal   |   GET   | <- text/plain |  | le prix total de la commande ou 404 |
+
+
+# Corps des requêtes
+
+**l1**
+
+Une commande comporte un id, un nom , un prix total , une liste de pizza, une date et un prix total . Sa représentation json est la suivante :
+
+```json
+{
+  "id": 1,
+  "name": "farid",
+  "date": "2021-01-01",
+  "price": 5,
+  "pizzas": [
+    {
+      "id": 1,
+      "name": "margarita",
+      "price": 5,
+      "ingredients": [
+        {
+          "id": 1,
+          "name": "tomate",
+          "price": 0.5
+        },
+        {
+          "id": 2,
+          "name": "oignon",
+          "price": 0.3
+        }
+      ]
+    }
+  ]
+}
+```
+
+# Exemple
+
+## Lister toutes les commandes connu dans la base de données
+
+#### GET /api/commandes
+
+requête vers le serveur 
+
+```json
+GET /api/commandes
+[
+  {
+    "id": 1,
+    "name": "farid",
+    "date": "2021-01-01",
+    "price": 5,
+    "pizzas": [
+      {
+        "id": 1,
+        "name": "margarita",
+        "price": 5,
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          },
+          {
+            "id": 2,
+            "name": "oignon",
+            "price": 0.3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "farid",
+    "date": "2021-01-01",
+    "price": 5,
+    "pizzas": [
+      {
+        "id": 1,
+        "name": "margarita",
+        "price": 5,
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          },
+          {
+            "id": 2,
+            "name": "oignon",
+            "price": 0.3
+          }
+        ]
+      }
+    ]
+  }
+]
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:---------:|:---------:|
+| 200 | La requete c'est effectué corrctement  |
+
+## Récupérer les détails de la commande
+
+#### GET /api/commandes/{id}
+
+Requête vers le serveur
+
+```json
+GET /api/commandes/1
+{
+  "id": 1,
+  "name": "farid",
+  "date": "2021-01-01",
+  "price": 5,
+  "pizzas": [
+    {
+      "id": 1,
+      "name": "margarita",
+      "price": 5,
+      "ingredients": [
+        {
+          "id": 1,
+          "name": "tomate",
+          "price": 0.5
+        },
+        {
+          "id": 2,
+          "name": "oignon",
+          "price": 0.3
+        }
+      ]
+    }
+  ]
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:---------:|:---------:|
+| 200 | La requete c'est effectué corrctement  |
+| 404 | La commande n'existe pas  |
+
+## Ajouter une commande
+
+#### POST /api/commandes
+
+Requête vers le serveur
+
+```json
+POST /api/commandes
+{
+  "name": "farid",
+  "date": "2021-01-01",
+  "price": 5,
+  "pizzas": [
+    {
+      "id": 1,
+      "name": "margarita",
+      "price": 5,
+      "ingredients": [
+        {
+          "id": 1,
+          "name": "tomate",
+          "price": 0.5
+        },
+        {
+          "id": 2,
+          "name": "oignon",
+          "price": 0.3
+        }
+      ]
+    }
+  ]
+}
+```
+
+reponse du serveur
+
+```json
+{
+  "id": 1,
+  "name": "farid",
+  "date": "2021-01-01",
+  "price": 5,
+  "pizzas": [
+    {
+      "id": 1,
+      "name": "margarita",
+      "price": 5,
+      "ingredients": [
+        {
+          "id": 1,
+          "name": "tomate",
+          "price": 0.5
+        },
+        {
+          "id": 2,
+          "name": "oignon",
+          "price": 0.3
+        }
+      ]
+    }
+  ]
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:---------:|:---------:|
+| 200 CREATED | La commande a été ajouté avec succès  |
+| 409 CONFLICT | La commande existe déjà  |
+
+## Supprimer une commande
+
+#### DELETE /api/commandes/{id}
+
+Requête vers le serveur
+
+```json
+    DELETE /api/commandes/1
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:---------:|:---------:|
+| 200 OK | La commande a été supprimé avec succès  |
+| 404 NOT FOUND | La commande n'existe pas  |
+
+## Récupérer le prix total de la commande
+
+#### GET /api/commandes/{id}/prixtotal
+
+Requête vers le serveur
+
+```json
+GET /api/commandes/1/prixtotal
+5
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:---------:|:---------:|
+| 200 | La requete c'est effectué corrctement  |
+| 404 | La commande n'existe pas  |
+
+
+
 
 
 
