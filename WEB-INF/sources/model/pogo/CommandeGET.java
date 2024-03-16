@@ -1,23 +1,24 @@
 package model.pogo;
 
+import java.util.Date;
 import java.util.List;
 
 public class CommandeGET {
 
     private Integer cno;
     private String cname;
-    private String cdate;
-    private List<PizzaGET> pizzas;
+    private Date cdate;
+    private List<CommandeLigneGET> pizzas;
     private float price;
 
-    public CommandeGET(Integer cno, String cname, String cdate, List<PizzaGET> pizzas) {
+    public CommandeGET(Integer cno, String cname, Date cdate, List<CommandeLigneGET> pizzas) {
         this.cno = cno;
         this.cname = cname;
         this.cdate = cdate;
         this.pizzas = pizzas;
         this.price = 0;
-        for (PizzaGET pizza : pizzas) {
-            this.price += pizza.getPrice();
+        for (CommandeLigneGET pizza : pizzas) {
+            this.price += pizza.getPizza().getPrice() * pizza.getPqte();
         }
     }
 
@@ -29,11 +30,11 @@ public class CommandeGET {
         return this.cname;
     }
 
-    public String getCdate() {
+    public Date getCdate() {
         return this.cdate;
     }
 
-    public List<PizzaGET> getPizzas() {
+    public List<CommandeLigneGET> getPizzas() {
         return this.pizzas;
     }
 
@@ -49,11 +50,11 @@ public class CommandeGET {
         this.cname = cname;
     }
 
-    public void setCdate(String cdate) {
+    public void setCdate(Date cdate) {
         this.cdate = cdate;
     }
 
-    public void setPizzas(List<PizzaGET> pizzas) {
+    public void setPizzas(List<CommandeLigneGET> pizzas) {
         this.pizzas = pizzas;
     }
 

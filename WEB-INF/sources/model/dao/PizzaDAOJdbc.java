@@ -13,7 +13,6 @@ import model.pogo.PizzaPOST;
 import model.pogo.IngredientGET;
 
 public class PizzaDAOJdbc {
-
     private DS dataSource;
 
     public PizzaDAOJdbc() {
@@ -23,20 +22,19 @@ public class PizzaDAOJdbc {
     public List<PizzaGET> findAll() {
         List<PizzaGET> pizzas = new ArrayList<PizzaGET>();
         try (Connection con = dataSource.getConnection()) {
+            String selectPizzasQuery = "SELECT * FROM pizzas ORDER BY pino";
+            String selectIngredientsQuery = "SELECT ino FROM contient WHERE pino = ? ORDER BY ino";
+            System.out.println(selectPizzasQuery);
+            ResultSet rsPizzas = con.createStatement().executeQuery(selectPizzasQuery);
             IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
-            System.out.println(
-                    "SELECT * FROM pizzas ORDER BY pino");
-            ResultSet rsPizzas = con.createStatement().executeQuery(
-                    "SELECT * FROM pizzas ORDER BY pino");
             while (rsPizzas.next()) {
                 List<IngredientGET> ingredients = new ArrayList<IngredientGET>();
-                PreparedStatement stmt = con.prepareStatement(
-                        "SELECT ino FROM contient WHERE pino = ?");
-                stmt.setInt(1, rsPizzas.getInt("pino"));
-                ResultSet rsIngredients = stmt.executeQuery();
+                PreparedStatement stmtIngredients = con.prepareStatement(selectIngredientsQuery);
+                stmtIngredients.setInt(1, rsPizzas.getInt("pino"));
+                System.out.println(stmtIngredients);
+                ResultSet rsIngredients = stmtIngredients.executeQuery();
                 while (rsIngredients.next()) {
-                    ingredients
-                            .add(ingredientDAO.findById(rsIngredients.getInt("ino")));
+                    ingredients.add(ingredientDAO.findById(rsIngredients.getInt("ino")));
                 }
                 pizzas.add(new PizzaGET(rsPizzas.getInt("pino"), rsPizzas.getString("piname"), ingredients,
                         rsPizzas.getString("pipate"), rsPizzas.getString("pibase")));
@@ -48,55 +46,59 @@ public class PizzaDAOJdbc {
     }
 
     public PizzaGET findById(int pino) {
-        PizzaGET pizza = null;
         try (Connection con = dataSource.getConnection()) {
-            IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
-            PreparedStatement stmt = con.prepareStatement("SELECT * FROM pizzas WHERE pino = ?");
-            stmt.setInt(1, pino);
-            System.out.println(stmt);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
+            String selectPizzaQuery = "SELECT * FROM pizzas WHERE pino = ?";
+            String selectIngredientsQuery = "SELECT ino FROM contient WHERE pino = ? ORDER BY ino";
+            PreparedStatement stmtPizza = con.prepareStatement(selectPizzaQuery);
+            stmtPizza.setInt(1, pino);
+            System.out.println(stmtPizza);
+            ResultSet rsPizza = stmtPizza.executeQuery();
+            if (rsPizza.next()) {
+                IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
                 List<IngredientGET> ingredients = new ArrayList<IngredientGET>();
-                PreparedStatement stmt2 = con.prepareStatement("SELECT ino FROM contient WHERE pino = ? ORDER BY ino");
-                stmt2.setInt(1, rs.getInt("pino"));
-                System.out.println(stmt2);
-                ResultSet rsIngredients = stmt2.executeQuery();
+                PreparedStatement stmtIngredients = con.prepareStatement(selectIngredientsQuery);
+                stmtIngredients.setInt(1, pino);
+                System.out.println(stmtIngredients);
+                ResultSet rsIngredients = stmtIngredients.executeQuery();
                 while (rsIngredients.next()) {
                     ingredients.add(ingredientDAO.findById(rsIngredients.getInt("ino")));
                 }
-                pizza = new PizzaGET(rs.getInt("pino"), rs.getString("piname"), ingredients, rs.getString("pipate"),
-                        rs.getString("pibase"));
+                return new PizzaGET(rsPizza.getInt("pino"), rsPizza.getString("piname"), ingredients,
+                        rsPizza.getString("pipate"), rsPizza.getString("pibase"));
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
-        return pizza;
+        return null;
     }
 
     public boolean save(PizzaPOST pizza) {
         try (Connection con = dataSource.getConnection()) {
-            ResultSet rs = con.createStatement().executeQuery("SELECT pino FROM pizzas ORDER BY pino");
+            String selectPizzasQuery = "SELECT pino FROM pizzas ORDER BY pino";
+            String insertPizzaQuery = "INSERT INTO pizzas (pino, piname, pipate, pibase) VALUES (?, ?, ?, ?)";
+            String insertContientQuery = "INSERT INTO contient (pino, ino) VALUES (?, ?)";
+            ResultSet rsPizzas = con.createStatement().executeQuery(selectPizzasQuery);
             int previousPino = 0;
-            while (rs.next()) {
-                if (rs.getInt("pino") == previousPino + 1)
-                    previousPino = rs.getInt("pino");
+            while (rsPizzas.next()) {
+                if (rsPizzas.getInt("pino") == previousPino + 1)
+                    previousPino = rsPizzas.getInt("pino");
             }
-            PreparedStatement stmt = con.prepareStatement(
-                    "INSERT INTO pizzas (pino, piname, pipate, pibase) VALUES (?, ?, ?, ?)");
-            stmt.setInt(1, previousPino + 1);
-            stmt.setString(2, pizza.getPiname());
-            stmt.setString(3, pizza.getPipate());
-            stmt.setString(4, pizza.getPibase());
-            System.out.println(stmt);
-            stmt.executeUpdate();
-            PreparedStatement stmt2 = con.prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?)");
-            for (int ino : pizza.getIngredients()) {
-                stmt2.clearParameters();
-                stmt2.setInt(1, previousPino + 1);
-                stmt2.setInt(2, ino);
-                System.out.println(stmt2);
-                stmt2.executeUpdate();
+            PreparedStatement stmtPizza = con.prepareStatement(insertPizzaQuery);
+            stmtPizza.setInt(1, previousPino + 1);
+            stmtPizza.setString(2, pizza.getPiname());
+            stmtPizza.setString(3, pizza.getPipate());
+            stmtPizza.setString(4, pizza.getPibase());
+            System.out.println(stmtPizza);
+            stmtPizza.executeUpdate();
+            PreparedStatement stmtContient = con.prepareStatement(insertContientQuery);
+            for (Integer ino : pizza.getIngredients()) {
+                stmtContient.clearParameters();
+                stmtContient.setInt(1, previousPino + 1);
+                stmtContient.setInt(2, ino);
+                System.out.println(stmtContient);
+                stmtContient.addBatch();
             }
+            stmtContient.executeBatch();
             return true;
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -106,20 +108,22 @@ public class PizzaDAOJdbc {
 
     public boolean save(PizzaGET pizza, Set<Integer> ingredients) {
         try (Connection con = dataSource.getConnection()) {
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO contient (pino, ino) VALUES (?, ?)");
+            String insertContientQuery = "INSERT INTO contient (pino, ino) VALUES (?, ?)";
+            PreparedStatement stmtContient = con.prepareStatement(insertContientQuery);
             for (IngredientGET ingredient : pizza.getIngredients()) {
                 while (ingredients.contains(ingredient.getIno())) {
                     ingredients.remove(ingredient.getIno());
                 }
             }
-            for (int ino : ingredients) {
-                stmt.clearParameters();
-                stmt.setInt(1, pizza.getPino());
-                stmt.setInt(2, ino);
-                System.out.println(stmt);
-                stmt.addBatch();
+            for (Integer ino : ingredients) {
+                stmtContient.clearParameters();
+                stmtContient.setInt(1, pizza.getPino());
+                stmtContient.setInt(2, ino);
+                System.out.println(stmtContient);
+                stmtContient.addBatch();
             }
-            return stmt.executeBatch().length == ingredients.size();
+            stmtContient.executeBatch();
+            return true;
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }

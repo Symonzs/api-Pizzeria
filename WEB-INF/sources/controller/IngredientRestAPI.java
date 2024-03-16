@@ -16,12 +16,13 @@ public class IngredientRestAPI extends RestAPI {
 
     public static IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
 
-    private static final String BAD_GET_REQUEST = "La requête doit être de la forme /ingredients ou /ingredients/{id} ou /ingredients/{id}/name (id entier)";
-    private static final String BAD_POST_REQUEST = "La requête doit être de la forme /ingredients avec un ingredient en JSON de la forme {\"iname\":\"nom\",\"iprice\":prix}";
-    private static final String BAD_JSON_POST_REQUEST = "Le JSON doit être de la forme {\"iname\":\"nom\",\"iprice\":prix}";
-    private static final String BAD_DELETE_REQUEST = "La requête doit être de la forme /ingredients/{id}";
-    private static final String NOT_FOUND = "L'ingrediant avec l'identifiant %s n'existe pas";
-    private static final String CONFLICT = "Un ingredient avec le même nom existe déjà";
+    private static final String BAD_GET_REQUEST = "Requêtes accepté /ingredients ou /ingredients/{id} ou /ingredients/{id}/name (id est un entier)";
+    private static final String BAD_POST_REQUEST = "Requêtes accepté /ingredients";
+    private static final String BAD_JSON_POST_REQUEST = "Format JSON : {\"iname\":\"nom\",\"iprice\":prix}";
+    private static final String BAD_DELETE_REQUEST = "Requêtes accepté /ingredients/{id} (id est un entier)";
+
+    private static final String NOT_FOUND = "Il n'y a pas d'ingredient avec l'identifiant %d";
+    private static final String CONFLICT = "Il existe déjà un ingredient avec ce nom";
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -37,35 +38,35 @@ public class IngredientRestAPI extends RestAPI {
             return;
         }
 
-        String[] splits = info.split("/");
-        if (splits.length > 3) {
+        String[] infos = info.split("/");
+        if (infos.length > 3) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
 
-        IngredientGET i = null;
         try {
-            i = ingredientDAO.findById(Integer.parseInt(splits[1]));
+            Integer ino = Integer.parseInt(infos[1]);
+            IngredientGET i = ingredientDAO.findById(ino);
+            if (i == null) {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, ino));
+                return;
+            }
+
+            if (infos.length == 3) {
+                if (infos[2].equals("name")) {
+                    out.print("{\n \"iname\":\"" + i.getIname() + "\"\n}");
+                    return;
+                }
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
+                return;
+            }
+
+            out.print(objectMapper.writeValueAsString(i));
+            return;
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
-        if (i == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, splits[1]));
-            return;
-        }
-
-        if (splits.length == 3) {
-            if (splits[2].equals("name")) {
-                out.print("{\n \"iname\":\"" + i.getIname() + "\"\n}");
-                return;
-            }
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
-            return;
-        }
-
-        out.print(objectMapper.writeValueAsString(i));
-        return;
     }
 
     @Override
@@ -94,25 +95,27 @@ public class IngredientRestAPI extends RestAPI {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_POST_REQUEST);
             return;
         }
-        IngredientPOST i = null;
+
         try {
-            i = objectMapper.readValue(data.toString(), IngredientPOST.class);
+            IngredientPOST i = objectMapper.readValue(data.toString(), IngredientPOST.class);
+
+            if (i.getIname() == null || i.getIprice() == null) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_POST_REQUEST);
+                return;
+            }
+
+            if (!IngredientRestAPI.ingredientDAO.save(i)) {
+                res.sendError(HttpServletResponse.SC_CONFLICT, CONFLICT);
+                return;
+            }
+
+            out.print(objectMapper.writeValueAsString(i));
+            res.setStatus(HttpServletResponse.SC_CREATED);
+            return;
         } catch (UnrecognizedPropertyException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_POST_REQUEST);
             return;
         }
-        if (i.getIname() == null || i.getIprice() == null) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_POST_REQUEST);
-            return;
-        }
-        if (!IngredientRestAPI.ingredientDAO.save(i)) {
-            res.sendError(HttpServletResponse.SC_CONFLICT, CONFLICT);
-            return;
-        }
-
-        out.print(objectMapper.writeValueAsString(i));
-        res.setStatus(HttpServletResponse.SC_CREATED);
-        return;
     }
 
     @Override
@@ -129,26 +132,26 @@ public class IngredientRestAPI extends RestAPI {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_DELETE_REQUEST);
         }
 
-        String[] splits = info.split("/");
-        if (splits.length != 2) {
+        String[] infos = info.split("/");
+        if (infos.length != 2) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        IngredientGET i = null;
         try {
-            i = ingredientDAO.findById(Integer.parseInt(splits[1]));
+            Integer ino = Integer.parseInt(infos[1]);
+            IngredientGET i = ingredientDAO.findById(ino);
+            if (i == null) {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, ino));
+                return;
+            }
+
+            ingredientDAO.delete(i);
+            out.print(objectMapper.writeValueAsString(i));
+            return;
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
-        if (i == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND, splits[1]));
-            return;
-        }
-
-        ingredientDAO.delete(i);
-        out.print(objectMapper.writeValueAsString(i));
-        return;
     }
 }

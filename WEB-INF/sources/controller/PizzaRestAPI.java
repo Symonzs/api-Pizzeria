@@ -1,7 +1,6 @@
 package controller;
 
 import java.io.*;
-import java.util.Set;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -11,29 +10,31 @@ import model.pogo.PizzaGET;
 import model.pogo.PizzaPOST;
 import jakarta.servlet.annotation.WebServlet;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 import model.pogo.IngredientGET;
+import model.pogo.IngredientSet;
 
 @WebServlet("/pizzas/*")
 public class PizzaRestAPI extends RestAPI {
 
     public static PizzaDAOJdbc pizzaDAO = new PizzaDAOJdbc();
 
-    private final String BAD_GET_REQUEST = "La requête doit être de la forme /pizzas, /pizzas/{id} ou /pizzas/{id}/prixfinal (id étant un entier)";
-    private final String BAD_POST_REQUEST = "La requête doit être de la forme /pizzas ou /pizzas/{id} (id étant un entier)";
-    private final String BAD_JSON_PIZZA_POST_REQUEST = "Le JSON doit être de la forme {\"piname\":\"nom\",\"ingredients\":[1, ...],\"pipate\":\"pate\",\"pibase\":\"base\"}";
-    private final String BAD_JSON_INGREDIENT_POST_REQUEST = "Le JSON doit être de la forme {\"ingredients\":[1, ...]}";
-    private final String BAD_DELETE_REQUEST = "La requête doit être de la forme /pizzas/{id} ou /pizzas/{id}/{idIngredient} (id et idIngredient étant des entiers)";
-    private final String BAD_PATCH_REQUEST = "La requête doit être de la forme /pizzas/{id} (id étant un entier)";
-    private final String BAD_JSON_PIZZA_PATCH = "Le JSON doit contenir au moins un des champs {\"piname\":\"nom\",\"ingredients\":[1, ...],\"pipate\":\"pate\",\"pibase\":\"base\"}";
+    private final String BAD_GET_REQUEST = "Requêtes accepté /pizzas, /pizzas/{id} ou /pizzas/{id}/prixfinal (id est un entier)";
+    private final String BAD_POST_REQUEST = "Requêtes accepté /pizzas ou /pizzas/{id} (id est un entier)";
+    private final String BAD_JSON_PIZZA_POST = "Format JSON {\"piname\":\"nom\",\"ingredients\":[1, ...],\"pipate\":\"pate\",\"pibase\":\"base\"}";
+    private final String BAD_JSON_INGREDIENT_POST = "Format JSON {\"ingredients\":[1, ...]}";
+    private final String BAD_DELETE_REQUEST = "Requêtes accepté /pizzas/{id} ou /pizzas/{id}/{idIngredient} (id et idIngredient sont des entiers)";
+    private final String BAD_PATCH_REQUEST = "Requêtes accepté /pizzas/{id} (id est un entier)";
+    private final String BAD_JSON_PIZZA_PATCH = "JSON avec au moins un des champs : {\"piname\":\"nom\",\"ingredients\":[1, ...],\"pipate\":\"pate\",\"pibase\":\"base\"}";
 
-    private final String NOT_FOUND_PIZZA = "La pizza avec l'identifiant %s n'existe pas";
-    private final String NOT_FOUND_INGREDIENT = "L'ingredient avec l'identifiant %s pour la pizza %s n'existe pas";
+    private final String NOT_FOUND_PIZZA = "Il n'y a pas de pizza avec l'identifiant %d";
+    private final String NOT_FOUND_INGREDIENT = "La pizza % n'a pas d'ingredient avec l'identifiant %d";
     private final String NOT_FOUND_INGREDIENTS = "Au moins un des ingredients %s n'existe pas";
-    private final String CONFLICT = "Une pizza avec le même nom existe déjà";
+    private final String CONFLICT = "Il existe déjà une pizza avec ce nom";
 
     @Override
     public void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -59,35 +60,35 @@ public class PizzaRestAPI extends RestAPI {
             return;
         }
 
-        String[] splits = info.split("/");
-        if (splits.length > 3) {
+        String[] infos = info.split("/");
+        if (infos.length > 3) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
 
-        PizzaGET p = null;
         try {
-            p = pizzaDAO.findById(Integer.parseInt(splits[1]));
+            Integer pino = Integer.parseInt(infos[1]);
+            PizzaGET p = pizzaDAO.findById(pino);
+            if (p == null) {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, pino));
+                return;
+            }
+
+            if (infos.length == 3) {
+                if (infos[2].equals("prixfinal")) {
+                    out.print("{\n \"prixfinal\": " + p.getPrice() + "\n}");
+                    return;
+                }
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
+                return;
+            }
+
+            out.print(objectMapper.writeValueAsString(p));
+            return;
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
             return;
         }
-        if (p == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, splits[1]));
-            return;
-        }
-
-        if (splits.length == 3) {
-            if (splits[2].equals("prixfinal")) {
-                out.print("{\n \"prixfinal\": " + p.getPrice() + "\n}");
-                return;
-            }
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_GET_REQUEST);
-            return;
-        }
-
-        out.print(objectMapper.writeValueAsString(p));
-        return;
     }
 
     @Override
@@ -99,6 +100,7 @@ public class PizzaRestAPI extends RestAPI {
 
         PrintWriter out = res.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 
         String splits[] = info.split("/");
         if (splits.length > 2) {
@@ -115,65 +117,63 @@ public class PizzaRestAPI extends RestAPI {
         }
 
         if (data.isEmpty()) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_POST_REQUEST);
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_POST);
             return;
         }
 
-        PizzaPOST p = null;
-
         if (splits.length == 2) {
+            try {
+                IngredientSet ingredientSet = objectMapper.readValue(data.toString(), IngredientSet.class);
 
-            Set<Integer> ingredients = null;
-            try {
-                ingredients = objectMapper.readValue(data.toString(),
-                        objectMapper.getTypeFactory().constructCollectionType(Set.class, Integer.class));
-            } catch (Exception e) {
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_INGREDIENT_POST_REQUEST);
+                if (ingredientSet == null || ingredientSet.getIngredients().isEmpty()) {
+                    res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_INGREDIENT_POST);
+                    return;
+                }
+
+                Integer pino = Integer.parseInt(splits[1]);
+                PizzaGET pg = pizzaDAO.findById(pino);
+                if (pg == null) {
+                    res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, pino));
+                    return;
+                }
+                if (!pizzaDAO.save(pg, ingredientSet.getIngredients())) {
+                    res.sendError(HttpServletResponse.SC_NOT_FOUND,
+                            String.format(NOT_FOUND_INGREDIENTS, ingredientSet.getIngredients().toString()));
+                    return;
+                }
+
+                pg = pizzaDAO.findById(pino);
+                out.print(objectMapper.writeValueAsString(pg));
                 return;
-            }
-            if (ingredients == null || ingredients.isEmpty()) {
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_INGREDIENT_POST_REQUEST);
-                return;
-            }
-            PizzaGET pg = null;
-            try {
-                pg = pizzaDAO.findById(Integer.parseInt(splits[1]));
             } catch (NumberFormatException e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_POST_REQUEST);
                 return;
-            }
-            if (pg == null) {
-                res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, splits[1]));
+            } catch (UnrecognizedPropertyException | InvalidFormatException e) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_INGREDIENT_POST);
                 return;
             }
-            if (!pizzaDAO.save(pg, ingredients)) {
-                res.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        String.format(NOT_FOUND_INGREDIENTS, ingredients.toString()));
-                return;
-            }
-            p = PizzaPOST.fromPizzaGET(pizzaDAO.findById(Integer.parseInt(splits[1])));
-
         } else {
             try {
-                p = objectMapper.readValue(data.toString(), PizzaPOST.class);
-            } catch (UnrecognizedPropertyException e) {
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_POST_REQUEST);
-                return;
-            }
-            if (p.getPiname() == null || p.getPipate() == null || p.getPibase() == null || p.getIngredients() == null
-                    || p.getIngredients().isEmpty()) {
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_POST_REQUEST);
-                return;
-            }
+                PizzaPOST p = objectMapper.readValue(data.toString(), PizzaPOST.class);
+                if (p.getPiname() == null || p.getPipate() == null || p.getPibase() == null
+                        || p.getIngredients() == null
+                        || p.getIngredients().isEmpty()) {
+                    res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_POST);
+                    return;
+                }
+                if (!pizzaDAO.save(p)) {
+                    res.sendError(HttpServletResponse.SC_CONFLICT, CONFLICT);
+                    return;
+                }
 
-            if (!pizzaDAO.save(p)) {
-                res.sendError(HttpServletResponse.SC_CONFLICT, CONFLICT);
+                out.print(objectMapper.writeValueAsString(p));
+                return;
+
+            } catch (UnrecognizedPropertyException | InvalidFormatException e) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_POST);
                 return;
             }
         }
-
-        out.print(objectMapper.writeValueAsString(p));
-        return;
     }
 
     @Override
@@ -197,38 +197,32 @@ public class PizzaRestAPI extends RestAPI {
             return;
         }
 
-        PizzaGET p = null;
         try {
-            p = pizzaDAO.findById(Integer.parseInt(splits[1]));
+            Integer pino = Integer.parseInt(splits[1]);
+            PizzaGET p = pizzaDAO.findById(pino);
+            if (p == null) {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, pino));
+                return;
+            }
+
+            if (splits.length == 3) {
+                Integer ino = Integer.parseInt(splits[2]);
+                if (!pizzaDAO.delete(p, ino)) {
+                    res.sendError(HttpServletResponse.SC_NOT_FOUND,
+                            String.format(NOT_FOUND_INGREDIENT, pino, ino));
+                    return;
+                }
+                IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
+                out.print(objectMapper.writeValueAsString(ingredientDAO.findById(ino)));
+                return;
+            }
+            pizzaDAO.delete(p);
+            out.print(objectMapper.writeValueAsString(p));
+            return;
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_DELETE_REQUEST);
             return;
         }
-        if (p == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, splits[1]));
-            return;
-        }
-
-        if (splits.length == 3) {
-            try {
-                if (!pizzaDAO.delete(p, Integer.parseInt(splits[2]))) {
-                    res.sendError(HttpServletResponse.SC_NOT_FOUND,
-                            String.format(NOT_FOUND_INGREDIENT, splits[1], splits[2]));
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_DELETE_REQUEST);
-                return;
-            }
-            IngredientDAOJdbc ingredientDAO = new IngredientDAOJdbc();
-            IngredientGET i = ingredientDAO.findById(Integer.parseInt(splits[2]));
-            out.print(objectMapper.writeValueAsString(i));
-            return;
-        }
-
-        pizzaDAO.delete(p);
-        out.print(objectMapper.writeValueAsString(p));
-        return;
     }
 
     public void doPatch(HttpServletRequest req, HttpServletResponse res)
@@ -264,37 +258,32 @@ public class PizzaRestAPI extends RestAPI {
             return;
         }
 
-        PizzaGET pg = null;
         try {
-            pg = pizzaDAO.findById(Integer.parseInt(splits[1]));
+            Integer pino = Integer.parseInt(splits[1]);
+            PizzaGET pg = pizzaDAO.findById(pino);
+
+            if (pg == null) {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, pino));
+                return;
+            }
+
+            PizzaPOST p = objectMapper.readValue(data.toString(), PizzaPOST.class);
+
+            if (!pizzaDAO.update(pino, p)) {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND,
+                        String.format(NOT_FOUND_INGREDIENTS, p.getIngredients()));
+                return;
+            }
+
+            out.print(objectMapper.writeValueAsString(pizzaDAO.findById(pino)));
+            return;
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_PATCH_REQUEST);
             return;
-        }
-
-        if (pg == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, splits[1]));
-            return;
-        }
-
-        PizzaPOST p = null;
-        try {
-            p = PizzaPOST.updatePizzaPOST(pg, objectMapper.readValue(data.toString(), PizzaPOST.class));
         } catch (UnrecognizedPropertyException | InvalidFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_PATCH);
             return;
         }
-
-        System.out.println(p.getPiname() + " " + p.getPipate() + " " + p.getPibase() + " " + p.getIngredients());
-
-        if (!pizzaDAO.update(Integer.parseInt(splits[1]), p)) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    String.format(NOT_FOUND_INGREDIENTS, p.getIngredients()));
-            return;
-        }
-
-        out.print(objectMapper.writeValueAsString(p));
-        return;
     }
 
     @Override
@@ -331,40 +320,37 @@ public class PizzaRestAPI extends RestAPI {
             return;
         }
 
-        PizzaGET pg = null;
         try {
-            pg = pizzaDAO.findById(Integer.parseInt(splits[1]));
+            Integer pino = Integer.parseInt(splits[1]);
+            PizzaGET pg = pizzaDAO.findById(pino);
+            if (pg == null) {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, pino));
+                return;
+            }
+
+            PizzaPOST p = objectMapper.readValue(data.toString(), PizzaPOST.class);
+
+            if (p.getPiname() == null || p.getPipate() == null || p.getPibase() == null || p.getIngredients() == null
+                    || p.getIngredients().isEmpty()) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_POST);
+                return;
+            }
+
+            if (!pizzaDAO.put(Integer.parseInt(splits[1]), p)) {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND,
+                        String.format(NOT_FOUND_INGREDIENTS, p.getIngredients()));
+                return;
+            }
+
+            out.print(objectMapper.writeValueAsString(pizzaDAO.findById(pino)));
+            return;
+
         } catch (NumberFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_PATCH_REQUEST);
             return;
-        }
-
-        if (pg == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, splits[1]));
-            return;
-        }
-
-        PizzaPOST p = null;
-        try {
-            p = objectMapper.readValue(data.toString(), PizzaPOST.class);
         } catch (UnrecognizedPropertyException | InvalidFormatException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_PATCH);
             return;
         }
-
-        if (p.getPiname() == null || p.getPipate() == null || p.getPibase() == null || p.getIngredients() == null
-                || p.getIngredients().isEmpty()) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_POST_REQUEST);
-            return;
-        }
-
-        if (!pizzaDAO.put(Integer.parseInt(splits[1]), p)) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    String.format(NOT_FOUND_INGREDIENTS, p.getIngredients()));
-            return;
-        }
-
-        out.print(objectMapper.writeValueAsString(pg));
-        return;
     }
 }

@@ -22,7 +22,7 @@ CREATE TABLE ingredients (
 CREATE TABLE commandes (
     cno INTEGER,
     cname VARCHAR(255),
-    cdate DATE,
+    cdate BIGINT,
     CONSTRAINT pk_commandes PRIMARY KEY (cno)
 );
 
@@ -39,6 +39,7 @@ CREATE TABLE contient (
 CREATE TABLE liste (
     cno INTEGER,
     pino INTEGER,
+    pqte INTEGER,
     CONSTRAINT pk_liste PRIMARY KEY (cno, pino),
     CONSTRAINT fk_liste_commandes FOREIGN KEY (cno) REFERENCES commandes(cno)
         ON DELETE CASCADE,

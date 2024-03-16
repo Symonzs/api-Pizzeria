@@ -19,7 +19,7 @@ public class PizzaGET {
         this.pino = pino;
         this.piname = piname;
         this.ingredients = ingredients;
-        this.price = 0.0f;
+        this.price = 0;
         for (IngredientGET ingredient : ingredients) {
             this.price += ingredient.getIprice();
         }
@@ -42,7 +42,7 @@ public class PizzaGET {
         return this.ingredients;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return this.price;
     }
 
