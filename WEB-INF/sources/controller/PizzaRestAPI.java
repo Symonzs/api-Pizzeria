@@ -1,6 +1,8 @@
 package controller;
 
 import java.io.*;
+import java.util.Set;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import model.dao.IngredientDAOJdbc;
@@ -14,7 +16,6 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 import model.pogo.IngredientGET;
-import model.pogo.IngredientSet;
 
 @WebServlet("/pizzas/*")
 public class PizzaRestAPI extends RestAPI {
@@ -121,16 +122,16 @@ public class PizzaRestAPI extends RestAPI {
         PizzaPOST p = null;
 
         if (splits.length == 2) {
-            System.out.println(splits);
 
-            IngredientSet il = null;
+            Set<Integer> ingredients = null;
             try {
-                il = objectMapper.readValue(data.toString(), IngredientSet.class);
+                ingredients = objectMapper.readValue(data.toString(),
+                        objectMapper.getTypeFactory().constructCollectionType(Set.class, Integer.class));
             } catch (Exception e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_INGREDIENT_POST_REQUEST);
                 return;
             }
-            if (il.getIngredients() == null || il.getIngredients().isEmpty()) {
+            if (ingredients == null || ingredients.isEmpty()) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_INGREDIENT_POST_REQUEST);
                 return;
             }
@@ -145,9 +146,9 @@ public class PizzaRestAPI extends RestAPI {
                 res.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(NOT_FOUND_PIZZA, splits[1]));
                 return;
             }
-            if (!pizzaDAO.save(pg, il.getIngredients())) {
+            if (!pizzaDAO.save(pg, ingredients)) {
                 res.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        String.format(NOT_FOUND_INGREDIENTS, il.getIngredients().toString()));
+                        String.format(NOT_FOUND_INGREDIENTS, ingredients.toString()));
                 return;
             }
             p = PizzaPOST.fromPizzaGET(pizzaDAO.findById(Integer.parseInt(splits[1])));

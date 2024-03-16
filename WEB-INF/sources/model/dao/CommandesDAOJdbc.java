@@ -6,9 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import model.pogo.CommandeGET;
-import model.pogo.IngredientGET;
+import model.pogo.CommandePOST;
 import model.pogo.PizzaGET;
 
 public class CommandesDAOJdbc {
@@ -21,23 +22,22 @@ public class CommandesDAOJdbc {
     public List<CommandeGET> findAll() {
         List<CommandeGET> commandes = new ArrayList<>();
         try (Connection con = dataSource.getConnection()) {
+            String selectCommandesQuery = "SELECT * FROM commandes ORDER BY cno";
+            String selectPizzasQuery = "SELECT pino FROM liste WHERE cno = ?";
+            System.out.println(selectCommandesQuery);
+            ResultSet rsCommandes = con.createStatement().executeQuery(selectCommandesQuery);
             PizzaDAOJdbc pizzaDAO = new PizzaDAOJdbc();
-            System.out.println(
-                    "SELECT * FROM commandes ORDER BY cno");
-            ResultSet rsCom = con.createStatement().executeQuery(
-                    "SELECT * FROM commandes ORDER BY cno");
-            while (rsCom.next()) {
+            while (rsCommandes.next()) {
                 List<PizzaGET> pizzas = new ArrayList<PizzaGET>();
-                PreparedStatement stmt = con.prepareStatement(
-                        "SELECT pino FROM liste WHERE cno = ?");
-                stmt.setInt(1, rsCom.getInt("cno"));
-                ResultSet rsPiz = stmt.executeQuery();
-                while (rsPiz.next()) {
-                    pizzas.add(pizzaDAO.findById(rsCom.getInt("pino")));
+                PreparedStatement stmtPizzas = con.prepareStatement(selectPizzasQuery);
+                stmtPizzas.setInt(1, rsCommandes.getInt("cno"));
+                System.out.println(stmtPizzas);
+                ResultSet rsPizzas = stmtPizzas.executeQuery();
+                while (rsPizzas.next()) {
+                    pizzas.add(pizzaDAO.findById(rsPizzas.getInt("pino")));
                 }
-                commandes.add(new CommandeGET(rsCom.getInt("cno"), rsCom.getString("cname"), rsCom.getString("cdate"),
-                        pizzas));
-
+                commandes.add(new CommandeGET(rsCommandes.getInt("cno"), rsCommandes.getString("cname"),
+                        rsCommandes.getString("cdate"), pizzas));
             }
             return commandes;
         } catch (SQLException e) {
@@ -48,19 +48,24 @@ public class CommandesDAOJdbc {
 
     public CommandeGET findById(int cno) {
         try (Connection con = dataSource.getConnection()) {
-            PreparedStatement stmt = con.prepareStatement("SELECT * FROM commandes WHERE cno = ?");
-            stmt.setInt(1, cno);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
+            String selectCommandeQuery = "SELECT * FROM commandes WHERE cno = ?";
+            String selectPizzasQuery = "SELECT pino FROM contient WHERE cno = ?";
+            PreparedStatement stmtCommande = con.prepareStatement(selectCommandeQuery);
+            stmtCommande.setInt(1, cno);
+            System.out.println(stmtCommande);
+            ResultSet rsCommande = stmtCommande.executeQuery();
+            if (rsCommande.next()) {
                 PizzaDAOJdbc pizzaDAO = new PizzaDAOJdbc();
                 List<PizzaGET> pizzas = new ArrayList<PizzaGET>();
-                PreparedStatement stmt2 = con.prepareStatement("SELECT pino FROM contient WHERE cno = ?");
-                stmt2.setInt(1, rs.getInt("cno"));
-                ResultSet rs2 = stmt2.executeQuery();
-                while (rs2.next()) {
-                    pizzas.add(pizzaDAO.findById(rs2.getInt("pino")));
+                PreparedStatement stmtPizzas = con.prepareStatement(selectPizzasQuery);
+                stmtPizzas.setInt(1, rsCommande.getInt("cno"));
+                System.out.println(stmtPizzas);
+                ResultSet rsPizzas = stmtPizzas.executeQuery();
+                while (rsPizzas.next()) {
+                    pizzas.add(pizzaDAO.findById(rsPizzas.getInt("pino")));
                 }
-                return new CommandeGET(rs.getInt("cno"), rs.getString("cname"), rs.getString("cdate"), pizzas);
+                return new CommandeGET(rsCommande.getInt("cno"), rsCommande.getString("cname"),
+                        rsCommande.getString("cdate"), pizzas);
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -71,6 +76,26 @@ public class CommandesDAOJdbc {
     public void delete(CommandeGET i) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    public boolean save(CommandeGET cg, Set<Integer> pizzas) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    public boolean save(CommandePOST cp) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    public boolean delete(CommandeGET cg, int int1) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    public boolean update(int int1, CommandePOST cp) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
 }
