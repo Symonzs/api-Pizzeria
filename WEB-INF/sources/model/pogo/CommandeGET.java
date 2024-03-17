@@ -17,8 +17,8 @@ public class CommandeGET {
         this.cdate = cdate;
         this.pizzas = pizzas;
         this.price = 0;
-        for (CommandeLigneGET pizza : pizzas) {
-            this.price += pizza.getPizza().getPrice() * pizza.getPqte();
+        for (CommandeLigneGET cl : pizzas) {
+            this.price += cl.getPizza().getPrice() * cl.getPqte();
         }
     }
 

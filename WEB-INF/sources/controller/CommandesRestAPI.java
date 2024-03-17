@@ -23,7 +23,7 @@ public class CommandesRestAPI extends RestAPI {
 
     private static final String BAD_GET_REQUEST = "Requêtes accepté /commandes ou /commandes/{id} ou /commandes/{id}/prixfinal (id est un entier)";
     private static final String BAD_POST_REQUEST = "Requêtes accepté /commandes ou /commandes/{id}";
-    private static final String BAD_JSON_COMMANDE_POST = "Format JSON : {\"cname\":\"nom\",\"cdate\":\"date\",\"pizzas\":[{\"pqte\":1,\"pino\":1}, ...]} (pqte est un entier > 0, pino est un entier)";
+    private static final String BAD_JSON_COMMANDE_POST = "Format JSON : {\"cname\":\"nom\",\"pizzas\":[{\"pqte\":1,\"pino\":1}, ...]} (pqte est un entier > 0, pino est un entier)";
     private static final String BAD_JSON_PIZZAS_POST = "Format JSON : [{\"pqte\":1,\"pino\":1}, ...] (pqte est un entier > 0, pino est un entier)";
     private static final String BAD_DELETE_REQUEST = "Requêtes accepté /commandes/{id} ou /commandes/{id}/{id_pizza}";
 
@@ -130,6 +130,7 @@ public class CommandesRestAPI extends RestAPI {
                     return;
                 }
                 out.print(objectMapper.writeValueAsString(commandesDAO.findById(cno)));
+                res.setStatus(HttpServletResponse.SC_CREATED);
                 return;
             } catch (NumberFormatException e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_POST_REQUEST);
@@ -153,6 +154,7 @@ public class CommandesRestAPI extends RestAPI {
                 }
 
                 out.print(objectMapper.writeValueAsString(cp));
+                res.setStatus(HttpServletResponse.SC_CREATED);
                 return;
             } catch (UnrecognizedPropertyException e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_COMMANDE_POST);

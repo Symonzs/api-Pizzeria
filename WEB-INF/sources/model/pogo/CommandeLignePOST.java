@@ -22,4 +22,9 @@ public class CommandeLignePOST {
     public void setPino(Integer pino) {
         this.pino = pino;
     }
+
+    @Override
+    public String toString() {
+        return "" + pino;
+    }
 }

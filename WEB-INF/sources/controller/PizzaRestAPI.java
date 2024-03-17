@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
-import model.pogo.IngredientGET;
 import model.pogo.IngredientSet;
 
 @WebServlet("/pizzas/*")
@@ -144,6 +143,7 @@ public class PizzaRestAPI extends RestAPI {
 
                 pg = pizzaDAO.findById(pino);
                 out.print(objectMapper.writeValueAsString(pg));
+                res.setStatus(HttpServletResponse.SC_CREATED);
                 return;
             } catch (NumberFormatException e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_POST_REQUEST);
@@ -167,8 +167,8 @@ public class PizzaRestAPI extends RestAPI {
                 }
 
                 out.print(objectMapper.writeValueAsString(p));
+                res.setStatus(HttpServletResponse.SC_CREATED);
                 return;
-
             } catch (UnrecognizedPropertyException | InvalidFormatException e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, BAD_JSON_PIZZA_POST);
                 return;

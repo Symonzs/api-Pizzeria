@@ -24,7 +24,7 @@ public class CommandesDAOJdbc {
         List<CommandeGET> commandes = new ArrayList<>();
         try (Connection con = dataSource.getConnection()) {
             String selectCommandesQuery = "SELECT * FROM commandes ORDER BY cno";
-            String selectPizzasQuery = "SELECT pino FROM liste WHERE cno = ?";
+            String selectPizzasQuery = "SELECT pino, pqte FROM liste WHERE cno = ?";
             System.out.println(selectCommandesQuery);
             ResultSet rsCommandes = con.createStatement().executeQuery(selectCommandesQuery);
             PizzaDAOJdbc pizzaDAO = new PizzaDAOJdbc();
@@ -50,7 +50,7 @@ public class CommandesDAOJdbc {
     public CommandeGET findById(int cno) {
         try (Connection con = dataSource.getConnection()) {
             String selectCommandeQuery = "SELECT * FROM commandes WHERE cno = ?";
-            String selectPizzasQuery = "SELECT pino FROM liste WHERE cno = ?";
+            String selectPizzasQuery = "SELECT pino, pqte FROM liste WHERE cno = ?";
             PreparedStatement stmtCommande = con.prepareStatement(selectCommandeQuery);
             stmtCommande.setInt(1, cno);
             System.out.println(stmtCommande);
@@ -110,14 +110,30 @@ public class CommandesDAOJdbc {
 
     public boolean save(CommandeGET cg, List<CommandeLignePOST> pizzas) {
         try (Connection con = dataSource.getConnection()) {
+            String selectListeQuery = "SELECT pino FROM liste WHERE cno = ? AND pino = ?";
             String insertListeQuery = "INSERT INTO liste (cno, pino, pqte) VALUES (?, ?, ?)";
-            PreparedStatement stmtListe = con.prepareStatement(insertListeQuery);
+            PreparedStatement stmtListe = con.prepareStatement(selectListeQuery);
             for (CommandeLignePOST cl : pizzas) {
                 stmtListe.setInt(1, cg.getCno());
                 stmtListe.setInt(2, cl.getPino());
-                stmtListe.setInt(3, cl.getPqte());
                 System.out.println(stmtListe);
-                stmtListe.addBatch();
+                ResultSet rsListe = stmtListe.executeQuery();
+                if (rsListe.next()) {
+                    String updateListeQuery = "UPDATE liste SET pqte = pqte + ? WHERE cno = ? AND pino = ?";
+                    PreparedStatement stmtUpdateListe = con.prepareStatement(updateListeQuery);
+                    stmtUpdateListe.setInt(1, cl.getPqte());
+                    stmtUpdateListe.setInt(2, cg.getCno());
+                    stmtUpdateListe.setInt(3, cl.getPino());
+                    System.out.println(stmtUpdateListe);
+                    stmtUpdateListe.executeUpdate();
+                } else {
+                    PreparedStatement stmtInsertListe = con.prepareStatement(insertListeQuery);
+                    stmtInsertListe.setInt(1, cg.getCno());
+                    stmtInsertListe.setInt(2, cl.getPino());
+                    stmtInsertListe.setInt(3, cl.getPqte());
+                    System.out.println(stmtInsertListe);
+                    stmtInsertListe.executeUpdate();
+                }
             }
             stmtListe.executeBatch();
             return true;
