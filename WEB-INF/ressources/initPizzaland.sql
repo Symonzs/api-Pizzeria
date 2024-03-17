@@ -4,19 +4,19 @@ DROP TABLE IF EXISTS commandes CASCADE;
 DROP TABLE IF EXISTS contient;
 DROP TABLE IF EXISTS liste;
 
+CREATE TABLE ingredients (
+    ino INTEGER,
+    iname VARCHAR(255) UNIQUE,
+    iprice DECIMAL(5,2),
+    CONSTRAINT pk_ingredients PRIMARY KEY (ino)
+);
+
 CREATE TABLE pizzas (
     pino INTEGER,
     piname VARCHAR(255) UNIQUE,
     pipate VARCHAR(255),
     pibase VARCHAR(255),
     CONSTRAINT pk_pizzas PRIMARY KEY (pino)
-);
-
-CREATE TABLE ingredients (
-    ino INTEGER,
-    iname VARCHAR(255) UNIQUE,
-    iprice DECIMAL(5,2),
-    CONSTRAINT pk_ingredients PRIMARY KEY (ino)
 );
 
 CREATE TABLE commandes (

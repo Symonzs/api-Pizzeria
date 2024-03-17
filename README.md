@@ -1,93 +1,954 @@
-# pizzalandAPI
+Bienvenue sur la documentation de l'API de Pizzaland. Elle est divisée en deux parties : la première partie décrit la base de données et la deuxième partie décrit les différents endpoints de l'API ainsi que les requêtes et réponses associées et quelques exemples.
 
+# Table de la Base de Données
 
+## Ingrédients
 
-## Getting started
+| Nom | Type | Description |
+|:---:|:----:|:-----------:|
+| ino | integer | Identifiant de l'ingrédient |
+| iname | varchar(50) | Nom de l'ingrédient |
+| iprice | decimal(5,2) | Prix de l'ingrédient |
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Clé primaire : ino
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Pizzas
 
-## Add your files
+| Nom | Type | Description |
+|:---:|:----:|:-----------:|
+| pino | integer | Identifiant de la pizza |
+| piname | varchar(50) | Nom de la pizza |
+| pipate | varchar(50) | Pâte de la pizza |
+| pibase | varchar(50) | Base de la pizza |
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+Clé primaire : pino
 
+## Commandes
+
+| Nom | Type | Description |
+|:---:|:----:|:-----------:|
+| cno | integer | Identifiant de la commande |
+| cname | varchar(50) | Nom du client |
+| cdate | bigint | Date de la commande |
+
+Clé primaire : cno
+
+## Contient (Ingrédient dans Pizza)
+
+| Nom | Type | Description |
+|:---:|:----:|:-----------:|
+| pino | integer | Identifiant de la pizza |
+| ino | integer | Identifiant de l'ingrédient |
+
+Clé primaire : pino, ino
+Clé étrangère : pino -> pizzas(pino) (Suppression en cascade)
+Clé étrangère : ino -> ingrédients(ino) (Suppression en cascade)
+
+## Liste (Pizza dans Commande)
+
+| Nom | Type | Description |
+|:---:|:----:|:-----------:|
+| cno | integer | Identifiant de la commande |
+| pino | integer | Identifiant de la pizza |
+| pqte | integer | Nombre de pizza |
+
+Clé primaire : cno, pino
+Clé étrangère : cno -> commandes(cno) (Suppression en cascade)
+Clé étrangère : pino -> pizzas(pino) (Suppression en cascade)
+
+## SQL
+
+```sql
+DROP TABLE IF EXISTS pizzas CASCADE;
+DROP TABLE IF EXISTS ingredients CASCADE;
+DROP TABLE IF EXISTS commandes CASCADE;
+DROP TABLE IF EXISTS contient;
+DROP TABLE IF EXISTS liste;
+
+CREATE TABLE ingredients (
+    ino INTEGER,
+    iname VARCHAR(255) UNIQUE,
+    iprice DECIMAL(5,2),
+    CONSTRAINT pk_ingredients PRIMARY KEY (ino)
+);
+
+CREATE TABLE pizzas (
+    pino INTEGER,
+    piname VARCHAR(255) UNIQUE,
+    pipate VARCHAR(255),
+    pibase VARCHAR(255),
+    CONSTRAINT pk_pizzas PRIMARY KEY (pino)
+);
+
+CREATE TABLE commandes (
+    cno INTEGER,
+    cname VARCHAR(255),
+    cdate BIGINT,
+    CONSTRAINT pk_commandes PRIMARY KEY (cno)
+);
+
+CREATE TABLE contient (
+    pino INTEGER,
+    ino INTEGER,
+    CONSTRAINT pk_contient PRIMARY KEY (pino, ino),
+    CONSTRAINT fk_contient_pizzas FOREIGN KEY (pino) REFERENCES pizzas(pino)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_contient_ingredients FOREIGN KEY (ino) REFERENCES ingredients(ino)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE liste (
+    cno INTEGER,
+    pino INTEGER,
+    pqte INTEGER,
+    CONSTRAINT pk_liste PRIMARY KEY (cno, pino),
+    CONSTRAINT fk_liste_commandes FOREIGN KEY (cno) REFERENCES commandes(cno)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_liste_pizzas FOREIGN KEY (pino) REFERENCES pizzas(pino)
+        ON DELETE CASCADE
+);
 ```
-cd existing_repo
-git remote add origin https://gitlab.univ-lille.fr/raphael.kiecken.etu/pizzalandapi.git
-git branch -M main
-git push -uf origin main
+
+# Pizzaland API
+
+## Ingrédients
+
+| URI | Opération | MIME | Requête | Réponse |
+|:---:|:---------:|:----:|:-------:|:-------:|
+| /ingredients | GET | <- application/json | | Tous les ingrédients |
+| /ingredients/{id} | GET | <- application/json | | Ingrédient (i1) ou 404 |
+| /ingredients/{id}/name | GET | <- application/json | | Nom de l'ingrédient (i2) ou 404 |
+| /ingredients | POST | <-/-> application/json | Ingrédient (i3) | Ingrédient ajouté ou 409 |
+| /ingredients{id} | DELETE | <- application/json | | Ingrédient supprimé ou 404 |
+
+### Corps des réponses/requêtes
+
+#### i1
+
+```json
+{
+  "ino": 1,
+  "iname": "tomate",
+  "iprice": 0.5
+}
 ```
 
-## Integrate with your tools
+#### i2
 
-- [ ] [Set up project integrations](https://gitlab.univ-lille.fr/raphael.kiecken.etu/pizzalandapi/-/settings/integrations)
+```json
+{
+  "iname": "tomate"
+}
+```
 
-## Collaborate with your team
+#### i3
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```json
+{
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
 
-## Test and Deploy
+### Exemples
 
-Use the built-in continuous integration in GitLab.
+#### Lister tous les ingrédients connu dans la base de données
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Requête vers le serveur : GET /pizzalandapi/ingredients
 
-***
+Réponse du serveur :
 
-# Editing this README
+```json
+[
+  {
+    "ino": 1,
+    "iname": "tomate",
+    "iprice": 0.5
+  },
+  {
+    "ino": 2,
+    "iname": "oignon",
+    "iprice": 0.3
+  }
+]
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+Codes de status HTTP
 
-## Suggestions for a good README
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+#### Récupérer les détails de l'ingredient
 
-## Name
-Choose a self-explaining name for your project.
+Requête vers le serveur : GET /pizzalandapi/ingredients/1
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+Réponse du serveur :
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```json
+{
+  "ino": 1,
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Codes de status HTTP
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | L'ingrédient n'existe pas |
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+#### Récupérer le nom de l'ingrédient
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+Requête vers le serveur : GET /pizzalandapi/ingredients/1/name
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+```json
+{
+  "iname": "tomate"
+}
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+Codes de status HTTP
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | L'ingrédient n'existe pas |
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+#### Ajouter un ingrédient
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Requête vers le serveur : POST /pizzalandapi/ingredients
 
-## License
-For open source projects, say how it is licensed.
+```json
+{
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Reponse du serveur :
+
+```json
+{
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 201 | L'ingrédient a été ajouté avec succès |
+| 409 | Un ingrédient avec le même nom existe déjà |
+
+#### Supprimer un ingrédient
+
+Requête vers le serveur : DELETE /pizzalandapi/ingredients/1
+
+Reponse du serveur :
+
+```json
+{
+  "ino": 1,
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | L'ingrédient a été supprimé avec succès |
+| 404 | L'ingrédient n'existe pas |
+
+## Pizzas
+
+| URI | Opération | MIME | Requête |Réponse|
+|:---:|:---------:|:----:|:-------:|:-----:|
+| /pizzas | GET | <- application/json | | Toutes les pizzas |
+| /pizzas/{id} | GET | <- application/json | | Pizza (p1) ou 404 |
+| /pizzas/{id}/prixfinal | GET | <- application/json | | Prix final de la pizza (p2) ou 404 |
+| /pizzas | POST | <-/-> application/json | Pizza (p3) | Pizza ajoutée ou 409 |
+| /pizzas/{id} | POST | <- application/json | | Pizza avec ingrédient ajouté ou 404 |
+| /pizzas/{id} | DELETE | | | Pizza supprimée ou 404 |
+| /pizzas/{id}/{idIngredient} | DELETE | <- application/json | | Ingrédient supprimé de la pizza ou 404 |
+| /pizzas/{id} | PATCH | <- application/json | Pizza (p3) Tout les champs ne sont pas obligatoire | Pizza modifiée ou 404 |
+| /pizzas/{id} | PUT | <- application/json | Pizza (p3) | Pizza modifiée ou 404 |
+
+### Corps des réponses/requêtes
+
+#### p1
+
+```json
+{
+  "pino": 1,
+  "piname": "margarita",
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "tomate",
+      "price": 0.5
+    }
+  ],
+  "price": 0.5,
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+#### p2
+
+```json
+{
+  "prixfinal": 0.5
+}
+```
+
+#### p3
+
+```json
+{
+  "piname": "margarita",
+  "ingredients": [
+    1
+  ],
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+### Exemple
+
+#### Lister toutes les pizzas connu dans la base de données
+
+Requête vers le serveur : GET /pizzalandapi/pizzas
+
+```json
+[
+  {
+    "pino": 1,
+    "piname": "margarita",
+    "ingredients": [
+      {
+        "id": 1,
+        "name": "tomate",
+        "price": 0.5
+      }
+    ],
+    "price": 0.5,
+    "pipate": "fine",
+    "pibase": "tomate"
+  }
+]
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+
+#### Récupérer les détails de la pizza
+
+Requête vers le serveur : GET /pizzalandapi/pizzas/1
+
+```json
+{
+  "pino": 1,
+  "piname": "margarita",
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "tomate",
+      "price": 0.5
+    }
+  ],
+  "price": 0.5,
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | La pizza n'existe pas |
+
+#### Récupérer le prix final de la pizza
+
+Requête vers le serveur : GET /pizzalandapi/pizzas/1/prixfinal
+
+```json
+{
+  "prixfinal": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | La pizza n'existe pas |
+
+#### Ajouter une pizza
+
+Requête vers le serveur : POST /pizzalandapi/pizzas
+
+```json
+{
+  "piname": "margarita",
+  "ingredients": [
+    1
+  ],
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+
+Reponse du serveur :
+
+```json
+{
+  "pino": 1,
+  "piname": "margarita",
+  "ingredients": [
+    1
+  ],
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 201 | La pizza a été ajoutée avec succès |
+| 409 | Une pizza avec le même nom existe déjà |
+
+#### Ajouter un ingrédient à la pizza
+
+Requête vers le serveur : POST /pizzalandapi/pizzas/1
+
+```json
+{
+  "ingredients": [
+    2,3
+  ]
+}
+```
+
+Reponse du serveur :
+
+```json
+{
+  "pino": 1,
+  "piname": "margarita",
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "tomate",
+      "price": 0.5
+    },
+    {
+      "id": 2,
+      "name": "oignon",
+      "price": 0.3
+    },
+    {
+      "id": 3,
+      "name": "fromage",
+      "price": 1
+    }
+  ],
+  "price": 1.8,
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | L'ingrédient a été ajouté avec succès |
+| 404 | La pizza ou un des ingrédients n'existe pas |
+
+#### Supprimer une pizza
+
+Requête vers le serveur : DELETE /pizzalandapi/pizzas/1
+
+Reponse du serveur :
+
+```json
+{
+  "pino": 1,
+  "piname": "margarita",
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "tomate",
+      "price": 0.5
+    }
+  ],
+  "price": 0.5,
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:---------:|:---------:|
+| 200 | La pizza a été supprimée avec succès |
+| 404 | La pizza n'existe pas |
+
+#### Supprimer un ingrédient de la pizza
+
+Requête vers le serveur : DELETE /pizzalandapi/pizzas/1/1
+
+```json
+{
+  "ino": 1,
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:---------:|:---------:|
+| 200 | L'ingrédient a été de la pizza avec succès |
+| 404 | La pizza n'existe pas ou l'ingrédient n'existe pas dans la pizza |
+
+#### Modifier un champs de la pizza
+
+Requête vers le serveur : PATCH /pizzalandapi/pizzas/1
+
+```json
+{
+  "piname": "reine",
+  "pipate": "grosse"
+}
+```
+
+Reponse du serveur :
+
+```json
+{
+  "pino": 1,
+  "piname": "reine",
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "tomate",
+      "price": 0.5
+    }
+  ],
+  "price": 0.5,
+  "pipate": "grosse",
+  "pibase": "tomate"
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La pizza a été modifiée avec succès |
+| 404 | La pizza ou un des ingrédients n'existe pas |
+
+#### Modifier totalement la pizza
+
+Requête vers le serveur : PUT /pizzalandapi/pizzas/1
+
+```json
+{
+  "piname": "reine",
+  "ingredients": [
+    3
+  ],
+  "pipate": "grosse",
+  "pibase": "tomate"
+}
+```
+
+Reponse du serveur :
+
+```json
+{
+  "pino": 1,
+  "piname": "reine",
+  "ingredients": [
+    {
+      "id": 3,
+      "name": "fromage",
+      "price": 1
+    }
+  ],
+  "price": 1,
+  "pipate": "grosse",
+  "pibase": "tomate"
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La pizza a été modifiée avec succès |
+| 404 | La pizza ou un des ingrédients n'existe pas |
+
+## Commandes
+
+| URI | Opération | MIME | Requête | Réponse |
+|:---:|:---------:|:----:|:-------:|:-------:|
+| /commandes | GET | <- application/json | | Toutes les commandes |
+| /commandes/{id} | GET | <- application/json | | Commande (c1) ou 404 |
+| /commandes/{id}/prixfinal | GET | <- application/json | | Prix final de la commande (c2) ou 404 |
+| /commandes | POST | <-/-> application/json | Commande (c3) | Commande ajoutée |
+| /commandes/{id} | POST | <-/-> application/json | Ligne commande (c4) | Commande avec pizza ajoutée ou 404 |
+| /commandes/{id} | DELETE | | | Commande supprimée ou 404 |
+
+### Corps des réponses/requêtes
+
+#### c1
+
+```json
+{
+  "cno": 1,
+  "cname": "farid",
+  "date": "17/01/2021",
+  "pizzas": [
+    {
+      "pqte": 1,
+      "pizza": {
+        "pino": 1,
+        "piname": "margarita",
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          }
+        ],
+        "price": 0.5,
+        "pipate": "fine",
+        "pibase": "tomate"
+      }
+    }
+  ],
+  "price": 0.5
+}
+```
+
+Une commande comporte un id, un nom , un prix total , une liste de pizza, une date et un prix total . Sa représentation json est la suivante :
+
+```json
+{
+  "id": 1,
+  "name": "farid",
+  "date": "2021-01-01",
+  "price": 5,
+  "pizzas": [
+    {
+      "id": 1,
+      "name": "margarita",
+      "price": 5,
+      "ingredients": [
+        {
+          "id": 1,
+          "name": "tomate",
+          "price": 0.5
+        },
+        {
+          "id": 2,
+          "name": "oignon",
+          "price": 0.3
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### c2
+
+```json
+{
+  "prixfinal": 0.5
+}
+```
+
+#### c3
+
+```json
+{
+  "cname": "farid",
+  "pizzas": [
+    {"pqte": 1, "pizza": 1}
+  ]
+}
+```
+
+#### c4
+
+```json
+[
+  {"pqte": 1, "pizza": 1}
+]
+```
+
+### Exemple
+
+#### Lister toutes les commandes connu dans la base de données
+
+Requête vers le serveur
+
+```json
+[
+  {
+    "cno": 1,
+    "cname": "farid",
+    "date": "17/01/2021",
+    "pizzas": [
+      {
+        "pqte": 1,
+        "pizza": {
+          "pino": 1,
+          "piname": "margarita",
+          "ingredients": [
+            {
+              "id": 1,
+              "name": "tomate",
+              "price": 0.5
+            }
+          ],
+          "price": 0.5,
+          "pipate": "fine",
+          "pibase": "tomate"
+        }
+      }
+    ],
+    "price": 0.5
+  }
+]
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+
+#### Récupérer les détails de la commande
+
+Requête vers le serveur : GET /pizzalandapi/commandes/1
+
+```json
+{
+  "cno": 1,
+  "cname": "farid",
+  "date": "17/01/2021",
+  "pizzas": [
+    {
+      "pqte": 1,
+      "pizza": {
+        "pino": 1,
+        "piname": "margarita",
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          }
+        ],
+        "price": 0.5,
+        "pipate": "fine",
+        "pibase": "tomate"
+      }
+    }
+  ],
+  "price": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | La commande n'existe pas |
+
+#### Récupérer le prix final de la commande
+
+Requête vers le serveur : GET /pizzalandapi/commandes/1/prixfinal
+
+```json
+{
+  "prixfinal": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | La commande n'existe pas |
+
+#### Ajouter une commande
+
+Requête vers le serveur : POST /pizzalandapi/commandes
+
+```json
+{
+  "cname": "farid",
+  "pizzas": [
+    {"pqte": 1, "pizza": 1}
+  ]
+}
+
+Reponse du serveur :
+
+```json
+{
+  "cname": "farid",
+  "pizzas": [
+    {"pqte": 1, "pizza": 1}
+  ]
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 201 | La commande a été ajoutée avec succès |
+
+#### Ajouter une pizza à la commande
+
+Requête vers le serveur : POST /pizzalandapi/commandes/1
+
+```json
+[
+  {
+    "pqte": 3,
+    "pizza": 1
+  }
+]
+```
+
+Reponse du serveur :
+
+```json
+{
+  "cno": 1,
+  "cname": "farid",
+  "date": "17/01/2021",
+  "pizzas": [
+    {
+      "pqte": 4,
+      "pizza": {
+        "pino": 1,
+        "piname": "margarita",
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          }
+        ],
+        "price": 0.5,
+        "pipate": "fine",
+        "pibase": "tomate"
+      }
+    }
+  ],
+  "price": 2
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La pizza a été ajoutée avec succès |
+| 404 | La commande ou une des pizzas n'existe pas |
+
+#### Supprimer une commande
+
+Requête vers le serveur : DELETE /pizzalandapi/commandes/1
+
+Reponse du serveur :
+
+```json
+{
+  "cno": 1,
+  "cname": "farid",
+  "date": "17/01/2021",
+  "pizzas": [
+    {
+      "pqte": 1,
+      "pizza": {
+        "pino": 1,
+        "piname": "margarita",
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          }
+        ],
+        "price": 0.5,
+        "pipate": "fine",
+        "pibase": "tomate"
+      }
+    }
+  ],
+  "price": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La commande a été supprimée avec succès |
+| 404 | La commande n'existe pas |
+
+#### Supprimer une pizza de la commande
+
+Requête vers le serveur : DELETE /pizzalandapi/commandes/1/1
+
+```json
+{
+  "pino": 1,
+  "piname": "margarita",
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "tomate",
+      "price": 0.5
+    }
+  ],
+  "price": 0.5,
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La pizza a été supprimée de la commande avec succès |
+| 404 | La commande n'existe pas ou la pizza n'existe pas dans la commande |
