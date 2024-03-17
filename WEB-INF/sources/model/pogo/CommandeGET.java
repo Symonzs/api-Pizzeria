@@ -1,5 +1,6 @@
 package model.pogo;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -7,14 +8,14 @@ public class CommandeGET {
 
     private Integer cno;
     private String cname;
-    private Date cdate;
+    private String cdate;
     private List<CommandeLigneGET> pizzas;
     private float price;
 
-    public CommandeGET(Integer cno, String cname, Date cdate, List<CommandeLigneGET> pizzas) {
+    public CommandeGET(Integer cno, String cname, long cdate, List<CommandeLigneGET> pizzas) {
         this.cno = cno;
         this.cname = cname;
-        this.cdate = cdate;
+        this.cdate = DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(cdate));
         this.pizzas = pizzas;
         this.price = 0;
         for (CommandeLigneGET cl : pizzas) {
@@ -30,7 +31,7 @@ public class CommandeGET {
         return this.cname;
     }
 
-    public Date getCdate() {
+    public String getCdate() {
         return this.cdate;
     }
 
@@ -51,7 +52,7 @@ public class CommandeGET {
     }
 
     public void setCdate(Date cdate) {
-        this.cdate = cdate;
+        this.cdate = DateFormat.getDateInstance(DateFormat.SHORT).format(cdate);
     }
 
     public void setPizzas(List<CommandeLigneGET> pizzas) {

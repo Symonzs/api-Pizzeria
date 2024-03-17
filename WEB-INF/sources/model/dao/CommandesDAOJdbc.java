@@ -39,7 +39,7 @@ public class CommandesDAOJdbc {
                             pizzaDAO.findById(rsPizzas.getInt("pino"))));
                 }
                 commandes.add(new CommandeGET(rsCommandes.getInt("cno"), rsCommandes.getString("cname"),
-                        new Date(rsCommandes.getLong("cdate")), pizzas));
+                        rsCommandes.getLong("cdate"), pizzas));
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -67,7 +67,7 @@ public class CommandesDAOJdbc {
                             pizzaDAO.findById(rsPizzas.getInt("pino"))));
                 }
                 return new CommandeGET(rsCommande.getInt("cno"), rsCommande.getString("cname"),
-                        new Date(rsCommande.getLong("cdate")), pizzas);
+                        rsCommande.getLong("cdate"), pizzas);
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());

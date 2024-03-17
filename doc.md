@@ -1,53 +1,64 @@
 
-# API Ingredients
+# Pizzaland API
 
 ## Ingrédients
 
-| URI | Opération | MIME | Requête |Réponse|
-|:---------:|:---------:|:---------:|:---------:|:---------:|
-|   /ingredients   |   GET   | <- application/json |  | liste des ingrédients (l1) |
-|   /ingredients/{id}   |   GET   | <- application/json |  | un ingrédient ou 404 |
-|   /ingredients/{id}/name   |   GET   | <- text/plain |  | le nom de l'ingrédient ou 404 |
-|   /ingredients   |   POST   | <-/-> application/json | Ingrédient (l2) | nouvel ingrédient ou 409 si il existe déjà |
-|   /ingredients{id}   |   DELETE   |  |  | |
+| URI | Opération | MIME | Requête | Réponse |
+|:---:|:---------:|:----:|:-------:|:-------:|
+| /ingredients | GET | <- application/json | | Tous les ingrédients |
+| /ingredients/{id} | GET | <- application/json | | Ingrédient (i1) ou 404 |
+| /ingredients/{id}/name | GET | <- application/json | | Nom de l'ingrédient (i2) ou 404 |
+| /ingredients | POST | <-/-> application/json | Ingrédient (i3) | Ingrédient ajouté ou 409 |
+| /ingredients{id} | DELETE | <- application/json | | Ingrédient supprimé ou 404 |
 
+### Corps des réponses/requêtes
 
-
-
-# Corps des requêtes
-
-**l1**
-
-Un ingrédient comporte un id,nom et un prix. Sa représentation json est la suivante :
+#### i1
 
 ```json
 {
-  "id": 1,
-  "name": "tomate",
-  "price": 0.5
+  "ino": 1,
+  "iname": "tomate",
+  "iprice": 0.5
 }
 ```
 
-# Exemple
-
-## Lister tous les ingrédients connu dans la base de données
-
-#### GET /api/v1/ingredients
-
-requête vers le serveur 
+#### i2
 
 ```json
-GET /api/ingredients
+{
+  "iname": "tomate"
+}
+```
+
+#### i3
+
+```json
+{
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
+
+### Exemples
+
+#### Lister tous les ingrédients connu dans la base de données
+
+Requête vers le serveur : GET /pizzalandapi/ingredients
+
+Réponse du serveur :
+
+```json
 [
   {
-    "id": 1,
-    "name": "tomate",
-    "price": 0.5
+    "ino": 1,
+    "iname": "tomate",
+    "iprice": 0.5
   },
   {
-    "id": 2,
-    "name": "oignon",
-    "price": 0.3
+    "ino": 2,
+    "iname": "oignon",
+    "iprice": 0.3
   }
 ]
 ```
@@ -55,181 +66,172 @@ GET /api/ingredients
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 | La requete c'est effectué corrctement  |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
 
-## Récupérer les détails de l'ingredient
+#### Récupérer les détails de l'ingredient
 
-#### GET /api/ingredients/{id}
+Requête vers le serveur : GET /pizzalandapi/ingredients/1
 
-Requête vers le serveur
+Réponse du serveur :
 
 ```json
-GET /api/ingredients/1
 {
-  "id": 1,
-  "name": "tomate",
-  "price": 0.5
+  "ino": 1,
+  "iname": "tomate",
+  "iprice": 0.5
 }
 ```
 
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 | La requete c'est effectué corrctement  |
-| 404 | L'ingrédient n'existe pas  |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | L'ingrédient n'existe pas |
 
-## Récupérer le nom de l'ingrédient
+#### Récupérer le nom de l'ingrédient
 
-#### GET /api/ingredients/{id}/name
-
-Requête vers le serveur
-
-```json
-GET /api/ingredients/1/name
-tomate
-```
-
-Codes de status HTTP
-
-| Status | Description |
-|:---------:|:---------:|
-| 200 | La requete c'est effectué corrctement  |
-| 404 | L'ingrédient n'existe pas  |
-
-## Ajouter un ingrédient
-
-#### POST /api/ingredients
-
-Requête vers le serveur
-
-```json
-POST /api/ingredients
-{
-  "name": "tomate",
-  "price": 0.5
-}
-```
-
-reponse du serveur
+Requête vers le serveur : GET /pizzalandapi/ingredients/1/name
 
 ```json
 {
-  "id": 1,
-  "name": "tomate",
-  "price": 0.5
+  "iname": "tomate"
 }
 ```
 
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 201 CREATED | L'ingrédient a été ajouté avec succès  |
-| 409 CONFLICT | L'ingrédient existe déjà  |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | L'ingrédient n'existe pas |
 
-## Supprimer un ingrédient
+#### Ajouter un ingrédient
 
-#### DELETE /api/ingredients/{id}
-
-Requête vers le serveur
+Requête vers le serveur : POST /pizzalandapi/ingredients
 
 ```json
-    DELETE /api/ingredients/1
+{
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
+
+Reponse du serveur :
+
+```json
+{
+  "iname": "tomate",
+  "iprice": 0.5
+}
 ```
 
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 OK | L'ingrédient a été supprimé avec succès  |
-| 404 NOT FOUND | L'ingrédient n'existe pas  |
+|:------:|:-----------:|
+| 201 | L'ingrédient a été ajouté avec succès |
+| 409 | Un ingrédient avec le même nom existe déjà |
+
+#### Supprimer un ingrédient
+
+Requête vers le serveur : DELETE /pizzalandapi/ingredients/1
+
+Reponse du serveur :
+
+```json
+{
+  "ino": 1,
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | L'ingrédient a été supprimé avec succès |
+| 404 | L'ingrédient n'existe pas |
 
 ## Pizzas
 
 | URI | Opération | MIME | Requête |Réponse|
-|:---------:|:---------:|:---------:|:---------:|:---------:|
-|   /pizzas   |   GET   | <- application/json |  | liste des pizza (l1) |
-|   /pizzas/{id}   |   GET   | <- application/json |  | une pizza ou 404 |
-|   /pizzas   |   POST   | <-/-> application/json | Pizza (l2) | nouvelle pizza ou 409 si elle existe déjà |
-|   /pizzas{id}   |   DELETE   |  |  | |
-|   /pizzas/{id}/prixfinal   |   GET   | <- text/plain |  | le prix de la pizza ou 404 |
-|   /pizzas/{id}/{idIngredient}   |   DELETE   | <- text/plain |  | suppression d'un ingredient de la pizza ou 404 |
-|   /pizzas/{id}   |   PUT   | <- application/json |  | ajouter un ingrédient à la pizza ou 404 |
-|  /pizzas/{id}   |   PATCH   | <- application/json |  | modifier une pizza ou 404 |
+|:---:|:---------:|:----:|:-------:|:-----:|
+| /pizzas | GET | <- application/json | | Toutes les pizzas |
+| /pizzas/{id} | GET | <- application/json | | Pizza (p1) ou 404 |
+| /pizzas/{id}/prixfinal | GET | <- application/json | | Prix final de la pizza (p2) ou 404 |
+| /pizzas | POST | <-/-> application/json | Pizza (p3) | Pizza ajoutée ou 409 |
+| /pizzas/{id} | POST | <- application/json | | Pizza avec ingrédient ajouté ou 404 |
+| /pizzas/{id} | DELETE | | | Pizza supprimée ou 404 |
+| /pizzas/{id}/{idIngredient} | DELETE | <- application/json | | Ingrédient supprimé de la pizza ou 404 |
+| /pizzas/{id} | PATCH | <- application/json | Pizza (p3) Tout les champs ne sont pas obligatoire | Pizza modifiée ou 404 |
+| /pizzas/{id} | PUT | <- application/json | Pizza (p3) | Pizza modifiée ou 404 |
 
+### Corps des réponses/requêtes
 
-# Corps des requêtes
-
-**l1**
-
-Une pizza comporte un id, nom, un prix et une liste d'ingredients. Sa représentation json est la suivante :
+#### p1
 
 ```json
 {
-  "id": 1,
-  "name": "margarita",
-  "price": 5,
+  "pino": 1,
+  "piname": "margarita",
   "ingredients": [
     {
       "id": 1,
       "name": "tomate",
       "price": 0.5
-    },
-    {
-      "id": 2,
-      "name": "oignon",
-      "price": 0.3
     }
-  ]
+  ],
+  "price": 0.5,
+  "pipate": "fine",
+  "pibase": "tomate"
 }
 ```
 
-# Exemple
-
-## Lister toutes les pizzas connu dans la base de données
-
-#### GET /api/pizzas
-
-requête vers le serveur 
+#### p2
 
 ```json
-GET /api/pizzas
+{
+  "prixfinal": 0.5
+}
+```
+
+#### p3
+
+```json
+{
+  "piname": "margarita",
+  "ingredients": [
+    1
+  ],
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+### Exemple
+
+#### Lister toutes les pizzas connu dans la base de données
+
+Requête vers le serveur : GET /pizzalandapi/pizzas
+
+```json
 [
   {
-    "id": 1,
-    "name": "margarita",
-    "price": 5,
+    "pino": 1,
+    "piname": "margarita",
     "ingredients": [
       {
         "id": 1,
         "name": "tomate",
         "price": 0.5
-      },
-      {
-        "id": 2,
-        "name": "oignon",
-        "price": 0.3
       }
-    ]
-  },
-  {
-    "id": 2,
-    "name": "4 fromages",
-    "price": 7,
-    "ingredients": [
-      {
-        "id": 1,
-        "name": "tomate",
-        "price": 0.5
-      },
-      {
-        "id": 3,
-        "name": "fromage",
-        "price": 1
-      }
-    ]
+    ],
+    "price": 0.5,
+    "pipate": "fine",
+    "pibase": "tomate"
   }
 ]
 ```
@@ -237,21 +239,107 @@ GET /api/pizzas
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 | La requete c'est effectué corrctement  |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
 
-## Récupérer les détails de la pizza
+#### Récupérer les détails de la pizza
 
-#### GET /api/pizzas/{id}
-
-Requête vers le serveur
+Requête vers le serveur : GET /pizzalandapi/pizzas/1
 
 ```json
-GET /api/pizzas/1
 {
-  "id": 1,
-  "name": "margarita",
-  "price": 5,
+  "pino": 1,
+  "piname": "margarita",
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "tomate",
+      "price": 0.5
+    }
+  ],
+  "price": 0.5,
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | La pizza n'existe pas |
+
+#### Récupérer le prix final de la pizza
+
+Requête vers le serveur : GET /pizzalandapi/pizzas/1/prixfinal
+
+```json
+{
+  "prixfinal": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | La pizza n'existe pas |
+
+#### Ajouter une pizza
+
+Requête vers le serveur : POST /pizzalandapi/pizzas
+
+```json
+{
+  "piname": "margarita",
+  "ingredients": [
+    1
+  ],
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+
+Reponse du serveur :
+
+```json
+{
+  "pino": 1,
+  "piname": "margarita",
+  "ingredients": [
+    1
+  ],
+  "pipate": "fine",
+  "pibase": "tomate"
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 201 | La pizza a été ajoutée avec succès |
+| 409 | Une pizza avec le même nom existe déjà |
+
+#### Ajouter un ingrédient à la pizza
+
+Requête vers le serveur : POST /pizzalandapi/pizzas/1
+
+```json
+{
+  "ingredients": [
+    2,3
+  ]
+}
+```
+
+Reponse du serveur :
+
+```json
+{
+  "pino": 1,
+  "piname": "margarita",
   "ingredients": [
     {
       "id": 1,
@@ -262,199 +350,195 @@ GET /api/pizzas/1
       "id": 2,
       "name": "oignon",
       "price": 0.3
+    },
+    {
+      "id": 3,
+      "name": "fromage",
+      "price": 1
     }
-  ]
+  ],
+  "price": 1.8,
+  "pipate": "fine",
+  "pibase": "tomate"
 }
 ```
 
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 | La requete c'est effectué corrctement  |
-| 404 | La pizza n'existe pas  |
+|:------:|:-----------:|
+| 200 | L'ingrédient a été ajouté avec succès |
+| 404 | La pizza ou un des ingrédients n'existe pas |
 
+#### Supprimer une pizza
 
-## Ajouter une pizza
+Requête vers le serveur : DELETE /pizzalandapi/pizzas/1
 
-#### POST /api/pizzas
-
-Requête vers le serveur
+Reponse du serveur :
 
 ```json
-POST /api/pizzas
 {
-  "name": "margarita",
-  "price": 5,
+  "pino": 1,
+  "piname": "margarita",
   "ingredients": [
     {
       "id": 1,
       "name": "tomate",
       "price": 0.5
-    },
-    {
-      "id": 2,
-      "name": "oignon",
-      "price": 0.3
     }
-  ]
+  ],
+  "price": 0.5,
+  "pipate": "fine",
+  "pibase": "tomate"
 }
 ```
 
-reponse du serveur
+Codes de status HTTP
+
+| Status | Description |
+|:---------:|:---------:|
+| 200 | La pizza a été supprimée avec succès |
+| 404 | La pizza n'existe pas |
+
+#### Supprimer un ingrédient de la pizza
+
+Requête vers le serveur : DELETE /pizzalandapi/pizzas/1/1
 
 ```json
 {
-  "id": 1,
-  "name": "margarita",
-  "price": 5,
+  "ino": 1,
+  "iname": "tomate",
+  "iprice": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:---------:|:---------:|
+| 200 | L'ingrédient a été de la pizza avec succès |
+| 404 | La pizza n'existe pas ou l'ingrédient n'existe pas dans la pizza |
+
+#### Modifier un champs de la pizza
+
+Requête vers le serveur : PATCH /pizzalandapi/pizzas/1
+
+```json
+{
+  "piname": "reine",
+  "pipate": "grosse"
+}
+```
+
+Reponse du serveur :
+
+```json
+{
+  "pino": 1,
+  "piname": "reine",
   "ingredients": [
     {
       "id": 1,
       "name": "tomate",
       "price": 0.5
-    },
-    {
-      "id": 2,
-      "name": "oignon",
-      "price": 0.3
     }
-  ]
+  ],
+  "price": 0.5,
+  "pipate": "grosse",
+  "pibase": "tomate"
 }
 ```
 
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 CREATED | La pizza a été ajouté avec succès  |
-| 409 CONFLICT | La pizza existe déjà  |
+|:------:|:-----------:|
+| 200 | La pizza a été modifiée avec succès |
+| 404 | La pizza ou un des ingrédients n'existe pas |
 
+#### Modifier totalement la pizza
 
-## Supprimer une pizza
-
-#### DELETE /api/pizzas/{id}
-
-Requête vers le serveur
+Requête vers le serveur : PUT /pizzalandapi/pizzas/1
 
 ```json
-    DELETE /api/pizzas/1
-```
-
-Codes de status HTTP
-
-| Status | Description |
-|:---------:|:---------:|
-| 200 OK | La pizza a été supprimé avec succès  |
-| 404 NOT FOUND | La pizza n'existe pas  |
-
-## Récupérer le prix final de la pizza
-
-#### GET /api/pizzas/{id}/prixfinal
-
-Requête vers le serveur
-
-```json
-GET /api/pizzas/1/prixfinal
-5
-```
-
-Codes de status HTTP
-
-| Status | Description |
-|:---------:|:---------:|
-| 200 | La requete c'est effectué corrctement  |
-| 404 | La pizza n'existe pas  |
-
-## Supprimer un ingrédient de la pizza
-
-#### DELETE /api/pizzas/{id}/{idIngredient}
-
-Requête vers le serveur
-
-```json
-    DELETE /api/pizzas/1/1
-```
-
-Codes de status HTTP
-
-| Status | Description |
-|:---------:|:---------:|
-| 200 OK | L'ingrédient a été supprimé avec succès  |
-| 404 NOT FOUND | La pizza ou l'ingrédient n'existe pas  |
-
-## Ajouter un ingrédient à la pizza
-
-#### PUT /api/pizzas/{id}
-
-Requête vers le serveur
-
-```json
-
-PUT /api/pizzas/1
 {
-  "id": 3,
-  "name": "fromage",
-  "price": 1
+  "piname": "reine",
+  "ingredients": [
+    3
+  ],
+  "pipate": "grosse",
+  "pibase": "tomate"
 }
 ```
 
-Codes de status HTTP
-
-| Status | Description |
-|:---------:|:---------:|
-| 200 OK | L'ingrédient a été ajouté avec succès  |
-| 404 NOT FOUND | La pizza ou l'ingrédient n'existe pas  |
-
-## Modifier une pizza
-
-#### PATCH /api/pizzas/{id}
-
-Requête vers le serveur
+Reponse du serveur :
 
 ```json
-
-PATCH /api/pizzas/1
 {
-  "name": "margarita",
-  "price": 5,
+  "pino": 1,
+  "piname": "reine",
   "ingredients": [
     {
-      "id": 1,
-      "name": "tomate",
-      "price": 0.5
-    },
-    {
-      "id": 2,
-      "name": "oignon",
-      "price": 0.3
+      "id": 3,
+      "name": "fromage",
+      "price": 1
     }
-  ]
+  ],
+  "price": 1,
+  "pipate": "grosse",
+  "pibase": "tomate"
 }
 ```
 
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 OK | La pizza a été modifié avec succès  |
-| 404 NOT FOUND | La pizza n'existe pas  |
-
+|:------:|:-----------:|
+| 200 | La pizza a été modifiée avec succès |
+| 404 | La pizza ou un des ingrédients n'existe pas |
 
 ## Commandes
 
-| URI | Opération | MIME | Requête |Réponse|
-|:---------:|:---------:|:---------:|:---------:|:---------:|
-|   /commandes   |   GET   | <- application/json |  | liste des commandes (l1) |
-|   /commandes/{id}   |   GET   | <- application/json |  | une commande ou 404 |
-|   /commandes   |   POST   | <-/-> application/json | Commande (l2) | nouvelle commande ou 409 si elle existe déjà |
-|   /commandes{id}   |   DELETE   | text/plain |  | rien ou 409|
-|   /commandes/{id}/prixtotal   |   GET   | <- text/plain |  | le prix total de la commande ou 404 |
+| URI | Opération | MIME | Requête | Réponse |
+|:---:|:---------:|:----:|:-------:|:-------:|
+| /commandes | GET | <- application/json | | Toutes les commandes |
+| /commandes/{id} | GET | <- application/json | | Commande (c1) ou 404 |
+| /commandes/{id}/prixfinal | GET | <- application/json | | Prix final de la commande (c2) ou 404 |
+| /commandes | POST | <-/-> application/json | Commande (c3) | Commande ajoutée |
+| /commandes/{id} | POST | <-/-> application/json | Ligne commande (c4) | Commande avec pizza ajoutée ou 404 |
+| /commandes/{id} | DELETE | | | Commande supprimée ou 404 |
 
+### Corps des réponses/requêtes
 
-# Corps des requêtes
+#### c1
 
-**l1**
+```json
+{
+  "cno": 1,
+  "cname": "farid",
+  "date": "17/01/2021",
+  "pizzas": [
+    {
+      "pqte": 1,
+      "pizza": {
+        "pino": 1,
+        "piname": "margarita",
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          }
+        ],
+        "price": 0.5,
+        "pipate": "fine",
+        "pibase": "tomate"
+      }
+    }
+  ],
+  "price": 0.5
+}
+```
 
 Une commande comporte un id, un nom , un prix total , une liste de pizza, une date et un prix total . Sa représentation json est la suivante :
 
@@ -486,66 +570,65 @@ Une commande comporte un id, un nom , un prix total , une liste de pizza, une da
 }
 ```
 
-# Exemple
-
-## Lister toutes les commandes connu dans la base de données
-
-#### GET /api/commandes
-
-requête vers le serveur 
+#### c2
 
 ```json
-GET /api/commandes
+{
+  "prixfinal": 0.5
+}
+```
+
+#### c3
+
+```json
+{
+  "cname": "farid",
+  "pizzas": [
+    {"pqte": 1, "pizza": 1}
+  ]
+}
+```
+
+#### c4
+
+```json
+[
+  {"pqte": 1, "pizza": 1}
+]
+```
+
+### Exemple
+
+#### Lister toutes les commandes connu dans la base de données
+
+Requête vers le serveur
+
+```json
 [
   {
-    "id": 1,
-    "name": "farid",
-    "date": "2021-01-01",
-    "price": 5,
+    "cno": 1,
+    "cname": "farid",
+    "date": "17/01/2021",
     "pizzas": [
       {
-        "id": 1,
-        "name": "margarita",
-        "price": 5,
-        "ingredients": [
-          {
-            "id": 1,
-            "name": "tomate",
-            "price": 0.5
-          },
-          {
-            "id": 2,
-            "name": "oignon",
-            "price": 0.3
-          }
-        ]
+        "pqte": 1,
+        "pizza": {
+          "pino": 1,
+          "piname": "margarita",
+          "ingredients": [
+            {
+              "id": 1,
+              "name": "tomate",
+              "price": 0.5
+            }
+          ],
+          "price": 0.5,
+          "pipate": "fine",
+          "pibase": "tomate"
+        }
       }
-    ]
-  },
-  {
-    "id": 2,
-    "name": "farid",
-    "date": "2021-01-01",
-    "price": 5,
-    "pizzas": [
-      {
-        "id": 1,
-        "name": "margarita",
-        "price": 5,
-        "ingredients": [
-          {
-            "id": 1,
-            "name": "tomate",
-            "price": 0.5
-          },
-          {
-            "id": 2,
-            "name": "oignon",
-            "price": 0.3
-          }
-        ]
-      }
-    ]
+    ],
+    "price": 0.5
   }
 ]
 ```
@@ -553,40 +636,84 @@ GET /api/commandes
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 | La requete c'est effectué corrctement  |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
 
-## Récupérer les détails de la commande
+#### Récupérer les détails de la commande
 
-#### GET /api/commandes/{id}
-
-Requête vers le serveur
+Requête vers le serveur : GET /pizzalandapi/commandes/1
 
 ```json
-GET /api/commandes/1
 {
-  "id": 1,
-  "name": "farid",
-  "date": "2021-01-01",
-  "price": 5,
+  "cno": 1,
+  "cname": "farid",
+  "date": "17/01/2021",
   "pizzas": [
     {
-      "id": 1,
-      "name": "margarita",
-      "price": 5,
-      "ingredients": [
-        {
-          "id": 1,
-          "name": "tomate",
-          "price": 0.5
-        },
-        {
-          "id": 2,
-          "name": "oignon",
-          "price": 0.3
-        }
-      ]
+      "pqte": 1,
+      "pizza": {
+        "pino": 1,
+        "piname": "margarita",
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          }
+        ],
+        "price": 0.5,
+        "pipate": "fine",
+        "pibase": "tomate"
+      }
     }
+  ],
+  "price": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | La commande n'existe pas |
+
+#### Récupérer le prix final de la commande
+
+Requête vers le serveur : GET /pizzalandapi/commandes/1/prixfinal
+
+```json
+{
+  "prixfinal": 0.5
+}
+```
+
+Codes de status HTTP
+
+| Status | Description |
+|:------:|:-----------:|
+| 200 | La requête s'est effectuée correctement |
+| 404 | La commande n'existe pas |
+
+#### Ajouter une commande
+
+Requête vers le serveur : POST /pizzalandapi/commandes
+
+```json
+{
+  "cname": "farid",
+  "pizzas": [
+    {"pqte": 1, "pizza": 1}
+  ]
+}
+
+Reponse du serveur :
+
+```json
+{
+  "cname": "farid",
+  "pizzas": [
+    {"pqte": 1, "pizza": 1}
   ]
 }
 ```
@@ -594,118 +721,124 @@ GET /api/commandes/1
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 | La requete c'est effectué corrctement  |
-| 404 | La commande n'existe pas  |
+|:------:|:-----------:|
+| 201 | La commande a été ajoutée avec succès |
 
-## Ajouter une commande
+#### Ajouter une pizza à la commande
 
-#### POST /api/commandes
-
-Requête vers le serveur
+Requête vers le serveur : POST /pizzalandapi/commandes/1
 
 ```json
-POST /api/commandes
-{
-  "name": "farid",
-  "date": "2021-01-01",
-  "price": 5,
-  "pizzas": [
-    {
-      "id": 1,
-      "name": "margarita",
-      "price": 5,
-      "ingredients": [
-        {
-          "id": 1,
-          "name": "tomate",
-          "price": 0.5
-        },
-        {
-          "id": 2,
-          "name": "oignon",
-          "price": 0.3
-        }
-      ]
-    }
-  ]
-}
+[
+  {
+    "pqte": 3,
+    "pizza": 1
+  }
+]
 ```
 
-reponse du serveur
+Reponse du serveur :
 
 ```json
 {
-  "id": 1,
-  "name": "farid",
-  "date": "2021-01-01",
-  "price": 5,
+  "cno": 1,
+  "cname": "farid",
+  "date": "17/01/2021",
   "pizzas": [
     {
-      "id": 1,
-      "name": "margarita",
-      "price": 5,
-      "ingredients": [
-        {
-          "id": 1,
-          "name": "tomate",
-          "price": 0.5
-        },
-        {
-          "id": 2,
-          "name": "oignon",
-          "price": 0.3
-        }
-      ]
+      "pqte": 4,
+      "pizza": {
+        "pino": 1,
+        "piname": "margarita",
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          }
+        ],
+        "price": 0.5,
+        "pipate": "fine",
+        "pibase": "tomate"
+      }
     }
-  ]
+  ],
+  "price": 2
 }
 ```
 
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 CREATED | La commande a été ajouté avec succès  |
-| 409 CONFLICT | La commande existe déjà  |
+|:------:|:-----------:|
+| 200 | La pizza a été ajoutée avec succès |
+| 404 | La commande ou une des pizzas n'existe pas |
 
-## Supprimer une commande
+#### Supprimer une commande
 
-#### DELETE /api/commandes/{id}
+Requête vers le serveur : DELETE /pizzalandapi/commandes/1
 
-Requête vers le serveur
+Reponse du serveur :
 
 ```json
-    DELETE /api/commandes/1
+{
+  "cno": 1,
+  "cname": "farid",
+  "date": "17/01/2021",
+  "pizzas": [
+    {
+      "pqte": 1,
+      "pizza": {
+        "pino": 1,
+        "piname": "margarita",
+        "ingredients": [
+          {
+            "id": 1,
+            "name": "tomate",
+            "price": 0.5
+          }
+        ],
+        "price": 0.5,
+        "pipate": "fine",
+        "pibase": "tomate"
+      }
+    }
+  ],
+  "price": 0.5
+}
 ```
 
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 OK | La commande a été supprimé avec succès  |
-| 404 NOT FOUND | La commande n'existe pas  |
+|:------:|:-----------:|
+| 200 | La commande a été supprimée avec succès |
+| 404 | La commande n'existe pas |
 
-## Récupérer le prix total de la commande
+#### Supprimer une pizza de la commande
 
-#### GET /api/commandes/{id}/prixtotal
-
-Requête vers le serveur
+Requête vers le serveur : DELETE /pizzalandapi/commandes/1/1
 
 ```json
-GET /api/commandes/1/prixtotal
-5
+{
+  "pino": 1,
+  "piname": "margarita",
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "tomate",
+      "price": 0.5
+    }
+  ],
+  "price": 0.5,
+  "pipate": "fine",
+  "pibase": "tomate"
+}
 ```
 
 Codes de status HTTP
 
 | Status | Description |
-|:---------:|:---------:|
-| 200 | La requete c'est effectué corrctement  |
-| 404 | La commande n'existe pas  |
-
-
-
-
-
-
+|:------:|:-----------:|
+| 200 | La pizza a été supprimée de la commande avec succès |
+| 404 | La commande n'existe pas ou la pizza n'existe pas dans la commande |
