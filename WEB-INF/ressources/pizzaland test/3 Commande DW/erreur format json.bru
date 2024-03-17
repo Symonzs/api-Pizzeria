@@ -1,0 +1,25 @@
+meta {
+  name: erreur format json
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/commandes/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "cno":8000,
+    "cname":"Raphaël",
+    "pizzas":[
+      {"pqte":3, "id":1}
+    ]
+  }
+}
+
+docs {
+  Ne fonctionne pas car manque un param
+}

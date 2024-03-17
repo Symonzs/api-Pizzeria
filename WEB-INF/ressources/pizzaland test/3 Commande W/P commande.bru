@@ -1,0 +1,24 @@
+meta {
+  name: P commande
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/commandes/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "cname" : "Raphaël",
+    "pizzas" : [
+      {"pqte":3, "pino":1}
+    ]
+  }
+}
+
+docs {
+  Fonctionne cette pizza est parfaite !
+}

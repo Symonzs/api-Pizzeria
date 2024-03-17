@@ -1,0 +1,21 @@
+meta {
+  name: pizza dans commande pizza inexistante
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/pizzalandapi/commandes/1
+  body: json
+  auth: none
+}
+
+body:json {
+  [
+    {"pqte":3, "pino":3}
+  ]
+}
+
+docs {
+  Ne fonctionne pas car manque un param
+}
